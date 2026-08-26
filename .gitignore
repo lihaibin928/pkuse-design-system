@@ -1,4 +1,5 @@
 .DS_Store
+.idea
 .pnpm-store/
 node_modules/
 dist/
@@ -9,6 +10,5 @@ __pycache__/
 .env
 .env.*
 !.env.example
-
 # Eval runs install full generated apps; do not upload
 .cursor/skills/pkuse-design-generator-workspace/
