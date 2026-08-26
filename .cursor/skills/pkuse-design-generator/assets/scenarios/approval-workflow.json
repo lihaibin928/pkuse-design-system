@@ -1,0 +1,13 @@
+{
+  "scene": "approval-workflow",
+  "routes": ["queue", "detail", "submitted"],
+  "patterns": [
+    "approval-queue",
+    "approval-detail",
+    "timeline",
+    "comment-thread",
+    "approve-reject-modal"
+  ],
+  "states": ["loading", "empty", "error", "forbidden"],
+  "permissions": ["view", "approve", "reject", "comment", "submit"]
+}

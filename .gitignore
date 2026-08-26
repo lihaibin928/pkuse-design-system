@@ -1,0 +1,12 @@
+.DS_Store
+.pnpm-store/
+node_modules/
+dist/
+coverage/
+*.log
+.env
+.env.*
+!.env.example
+
+# Eval runs install full generated apps; do not upload
+.cursor/skills/pkuse-design-generator-workspace/

@@ -1,0 +1,20 @@
+{
+  "scene": "monitoring",
+  "routes": ["overview", "resources", "logs", "alerts", "operations"],
+  "patterns": [
+    "status-cards",
+    "resource-table",
+    "log-search",
+    "alert-detail",
+    "ack-silence-modal"
+  ],
+  "states": ["loading", "empty", "error", "forbidden"],
+  "permissions": [
+    "overview-view",
+    "resources-view",
+    "logs-view",
+    "alerts-view",
+    "alerts-ack",
+    "operations-view"
+  ]
+}

@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PKUSE 设计规范预览 · Ant Design v6</title>
+  <style>
+    :root {
+      --primary: #1677FF;
+      --primary-hover: #4096FF;
+      --primary-active: #0958D9;
+      --primary-bg: #E6F4FF;
+      --success: #52C41A;
+      --warning: #FAAD14;
+      --error: #FF4D4F;
+      --info: #1677FF;
+      --blue: #1677FF;
+      --blue-7: #0958D9;
+      --purple: #722ED1;
+      --cyan: #13C2C2;
+      --green: #52C41A;
+      --magenta: #EB2F96;
+      --red: #F5222D;
+      --orange: #FA8C16;
+      --yellow: #FADB14;
+      --volcano: #FA541C;
+      --geekblue: #2F54EB;
+      --gold: #FAAD14;
+      --lime: #A0D911;
+      --text: #1F1F1F;
+      --text-secondary: #595959;
+      --text-disabled: #BFBFBF;
+      --surface: #FFFFFF;
+      --surface-container: #FAFAFA;
+      --surface-layout: #F5F5F5;
+      --outline: #D9D9D9;
+      --outline-variant: #F0F0F0;
+      --radius-none: 0px;
+      --radius-sm: 2px;
+      --radius-md: 4px;
+      --radius: 6px;
+      --radius-lg: 8px;
+      --radius-xl: 16px;
+      --radius-full: 9999px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      --font-code: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      --shadow-tertiary: 0 1px 2px 0 rgba(0,0,0,0.05), 0 1px 6px -1px rgba(0,0,0,0.03), 0 2px 4px 0 rgba(0,0,0,0.03);
+      --shadow-popup: 0 6px 16px 0 rgba(0,0,0,0.08), 0 3px 6px -4px rgba(0,0,0,0.12), 0 9px 28px 8px rgba(0,0,0,0.05);
+      --mask: rgba(0, 0, 0, 0.45);
+      --tooltip-bg: rgba(0, 0, 0, 0.85);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: var(--font);
+      font-size: 14px;
+      line-height: 22px;
+      font-weight: 400;
+      color: var(--text);
+      background: var(--surface-layout);
+    }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { color: var(--primary-hover); }
+    code, .mono { font-family: var(--font-code); font-size: 13px; line-height: 20px; }
+    .shell { display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
+    nav {
+      position: sticky; top: 0; height: 100vh; overflow: auto;
+      background: var(--surface);
+      border-right: 1px solid var(--outline);
+      padding: 24px 16px;
+    }
+    nav .brand { font-weight: 600; font-size: 16px; line-height: 24px; margin: 0 0 4px; }
+    nav .meta { color: var(--text-secondary); font-size: 12px; line-height: 20px; margin: 0 0 24px; }
+    nav a {
+      display: block; padding: 8px 12px; border-radius: var(--radius);
+      color: var(--text); margin-bottom: 4px;
+    }
+    nav a:hover { background: var(--surface-container); }
+    nav a.active, nav a:target { background: var(--primary-bg); color: var(--primary); }
+    main { padding: 32px 40px 80px; max-width: 1120px; }
+    h1 { font-size: 30px; line-height: 38px; font-weight: 600; margin: 0 0 8px; }
+    h2 { font-size: 20px; line-height: 28px; font-weight: 600; margin: 48px 0 16px; }
+    h3 { font-size: 16px; line-height: 24px; font-weight: 600; margin: 24px 0 12px; }
+    h4 { font-size: 14px; line-height: 22px; font-weight: 600; margin: 16px 0 8px; }
+    .lead { color: var(--text-secondary); margin: 0 0 16px; }
+    .note { color: var(--text-secondary); font-size: 12px; line-height: 20px; }
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+    .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+    .swatch { border: 1px solid var(--outline); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
+    .chip { height: 56px; }
+    .swatch .meta { padding: 8px 12px; }
+    .swatch strong { display: block; font-weight: 600; }
+    .swatch code { color: var(--text-secondary); }
+    .type-row {
+      display: grid; grid-template-columns: 180px 1fr;
+      gap: 16px; align-items: baseline;
+      padding: 12px 0; border-bottom: 1px solid var(--outline-variant);
+    }
+    .type-row span { color: var(--text-secondary); font-size: 12px; line-height: 20px; }
+    .space-row, .btn-row, .form-row, .inline { display: flex; gap: 16px; align-items: end; flex-wrap: wrap; }
+    .form-row { align-items: center; gap: 12px; }
+    .btn-row { align-items: center; gap: 12px; }
+    .space-box {
+      background: var(--primary-bg); border: 1px dashed var(--primary);
+      display: grid; place-items: center; color: var(--primary); font-size: 12px;
+    }
+    button, .input, select {
+      font: inherit; height: 32px; border-radius: var(--radius); padding: 0 15px;
+    }
+    .btn-primary { background: var(--primary); color: #fff; border: 0; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-primary:active { background: var(--primary-active); }
+    .btn-default { background: var(--surface); color: var(--text); border: 1px solid var(--outline); }
+    .btn-default:hover { color: var(--primary-hover); border-color: var(--primary-hover); }
+    .btn-disabled { background: var(--surface-container); color: var(--text-disabled); border: 1px solid var(--outline); }
+    .input { border: 1px solid var(--outline); width: 240px; padding: 4px 11px; background: var(--surface); color: var(--text); }
+    .input::placeholder { color: var(--text-disabled); }
+    .input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.2); }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: var(--surface-container); text-align: left; padding: 16px; font-weight: 600; font-size: 14px; line-height: 22px; }
+    td { padding: 16px; border-bottom: 1px solid var(--outline-variant); }
+    tbody tr:hover { background: rgba(0, 0, 0, 0.02); }
+    .tag { display: inline-block; padding: 0 7px; border-radius: var(--radius-md); font-size: 12px; line-height: 20px; background: var(--surface-container); }
+    .tag-blue { background: #E6F4FF; color: #0958D9; }
+    .tag-green { background: #F6FFED; color: #389e0d; }
+    .alert { padding: 8px 12px; border-radius: var(--radius-lg); margin-bottom: 8px; }
+    .alert-success { background: #F6FFED; }
+    .alert-warning { background: #FFFBE6; }
+    .alert-error { background: #FFF2F0; }
+    .alert-info { background: #E6F4FF; }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .ok, .bad { padding: 16px; border-radius: var(--radius); }
+    .ok { background: #F6FFED; }
+    .bad { background: #FFF2F0; }
+    .ok h3, .bad h3 { margin-top: 0; }
+    .choose { width: 100%; }
+    .choose th { width: 22%; }
+    .choose td { vertical-align: top; }
+    .ok p, .bad p { margin: 0 0 8px; }
+    .values { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .value-card { border: 1px solid var(--outline); border-radius: var(--radius-lg); padding: 16px; }
+    .value-card strong { color: var(--primary); }
+    .layers {
+      background: var(--surface-layout); border-radius: var(--radius-lg); padding: 24px;
+    }
+    .layer-container {
+      background: var(--surface); border-radius: var(--radius-lg); padding: 24px;
+    }
+    .layer-elevated {
+      background: var(--surface); border-radius: var(--radius-lg); padding: 20px 24px;
+      box-shadow: var(--shadow-popup); max-width: 360px;
+    }
+    .shadow-box { background: var(--surface); border-radius: var(--radius-lg); padding: 16px; }
+    .shadow-tertiary { box-shadow: var(--shadow-tertiary); }
+    .shadow-popup { box-shadow: var(--shadow-popup); }
+    .radius-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: end; }
+    .radius-demo {
+      width: 96px; height: 48px; background: var(--primary-bg); border: 1px solid var(--primary);
+      display: grid; place-items: center; font-size: 12px; color: var(--primary);
+    }
+    .menu { width: 240px; border: 1px solid var(--outline); border-radius: var(--radius); overflow: hidden; }
+    .menu-item { padding: 8px 12px; }
+    .menu-item.selected { background: var(--primary-bg); color: var(--primary); }
+    .tabs { display: flex; gap: 24px; border-bottom: 1px solid var(--outline); }
+    .tab { background: none; border: 0; height: auto; padding: 8px 0; color: var(--text-secondary); border-radius: 0; }
+    .tab.active { color: var(--primary); box-shadow: inset 0 -2px 0 var(--primary); font-weight: 400; }
+    .tooltip {
+      display: inline-block; background: var(--tooltip-bg); color: #fff;
+      border-radius: var(--radius-md); padding: 6px 8px;
+    }
+    .dropdown { width: 200px; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-popup); padding: 4px 0; }
+    .dropdown-item { padding: 8px 12px; }
+    .dropdown-item:hover { background: var(--surface-container); }
+    .badge { display: inline-block; width: 6px; height: 6px; border-radius: var(--radius-full); background: var(--error); vertical-align: middle; }
+    .alpha-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .alpha-card { border: 1px solid var(--outline); border-radius: var(--radius); overflow: hidden; }
+    .alpha-on-white, .alpha-on-tint { padding: 12px; }
+    .alpha-on-tint { background: var(--primary-bg); }
+    .motion-row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .motion-box {
+      width: 120px; height: 48px; background: var(--primary); color: #fff; border-radius: var(--radius);
+      display: grid; place-items: center; font-size: 12px;
+    }
+    .motion-box:hover { transform: translateX(8px); }
+    .fast { transition: transform 0.1s cubic-bezier(0.645, 0.045, 0.355, 1); }
+    .mid { transition: transform 0.2s cubic-bezier(0.645, 0.045, 0.355, 1); }
+    .slow { transition: transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1); }
+    .modal-stage {
+      position: relative; min-height: 220px; background: var(--surface-layout);
+      border-radius: var(--radius-lg); overflow: hidden;
+    }
+    .modal-mask { position: absolute; inset: 0; background: var(--mask); }
+    .modal-panel {
+      position: absolute; left: 50%; top: 24px; transform: translateX(-50%);
+      width: min(420px, calc(100% - 32px));
+      background: var(--surface); border-radius: var(--radius-lg);
+      padding: 20px 24px; box-shadow: var(--shadow-popup);
+    }
+    .callout {
+      background: var(--primary-bg); border-radius: var(--radius-lg); padding: 12px 16px; margin: 0 0 16px;
+    }
+    pre {
+      background: var(--surface-container); border-radius: var(--radius); padding: 16px;
+      overflow: auto; font-family: var(--font-code); font-size: 13px; line-height: 20px;
+    }
+    ol.steps { padding-left: 20px; }
+    ol.steps li { margin-bottom: 12px; }
+    @media (max-width: 800px) {
+      .shell { grid-template-columns: 1fr; }
+      nav { position: relative; height: auto; }
+      .compare, .values, .alpha-row { grid-template-columns: 1fr; }
+      .type-row { grid-template-columns: 1fr; gap: 4px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <nav>
+      <p class="brand">PKUSE 设计规范</p>
+      <p class="meta">对照 ant-design-v6.md<br />Ant Design v6 默认浅色主题</p>
+      <a href="#overview">概述</a>
+      <a href="#values">价值观</a>
+      <a href="#colors">色彩</a>
+      <a href="#type">字体</a>
+      <a href="#layout">布局</a>
+      <a href="#elevation">海拔与动效</a>
+      <a href="#shapes">形状</a>
+      <a href="#choose">组件选用</a>
+      <a href="#components">组件外观</a>
+      <a href="#rules">对与错</a>
+      <a href="#customize">定制</a>
+    </nav>
+    <main>
+      <h1>即时预览</h1>
+      <p class="lead">视觉对照 <code>references/ant-design-v6.md</code>（来源 <a href="https://ant.design/design.md">ant.design/design.md</a>）。组件何时使用见下方选用表，完整说明在 <a href="../../.cursor/skills/pkuse-design-generator/references/components/INDEX.md">components/INDEX.md</a>。第一版视觉基线是 Ant Design 默认蓝，不是绿色品牌皮肤。</p>
+
+      <h2 id="overview">概述</h2>
+      <div class="card">
+        <p>本文描述 <strong>Ant Design v6</strong> 默认浅色主题。系统遵循语义化版本：大版本（v5 → v6）表示设计语言重构，小版本与补丁版本保持本文稳定。主版本内的 Token 漂移见 CHANGELOG。</p>
+        <p>Ant Design 是蚂蚁集团用于交付企业软件的开源设计系统，主要面向中后台控制台、看板和运营工具。2015 年创建，目的是给大型产品团队一套有主张的共同基础，使密集、数据丰富的界面不必在每个屏幕上重新决定基础规则。</p>
+      </div>
+
+      <h2 id="values">价值观</h2>
+      <p class="lead">四个价值观指导系统中的每一个决策。</p>
+      <div class="values">
+        <div class="value-card"><strong>Natural</strong><p>界面遵循既有惯例，不让回头用户感到意外。优先采用操作系统和前代企业软件中已存在的模式，而不是发明新交互。</p></div>
+        <div class="value-card"><strong>Certain</strong><p>用户始终知道自己处于什么状态、输入产生了什么结果、下一步是什么。悬停、焦点、加载和错误状态明确且一致。</p></div>
+        <div class="value-card"><strong>Meaningful</strong><p>视觉强调只留给行动。不传达信息的装饰一律去掉。</p></div>
+        <div class="value-card"><strong>Growing</strong><p>系统可以从小表单扩到密表格、再扩到多租户管理控制台，而不失去一致性。</p></div>
+      </div>
+
+      <h2 id="colors">色彩</h2>
+      <div class="card">
+        <p>色板由一个<strong>主色</strong>种子、四个语义状态种子（<code>success</code> / <code>warning</code> / <code>error</code> / <code>info</code>）以及文字与表面的中性色构成。种子经 <code>@ant-design/colors</code> 自动展开为背景浅色、悬停、按下和描边阶梯——改种子，整套派生色一起移动。</p>
+        <p><code>#1677FF</code> 被选为主色，因为蓝色读起来可信、专注，既没有更深海军蓝的刻板，也没有高饱和青色的俏皮。它是操作、链接、焦点环、选中导航和激活 Tab 的默认品牌色。</p>
+        <div class="callout">无障碍说明：本文记录的是默认视觉 Token。部分品牌色组合（尤其是白字配 <code>#1677FF</code>，以及主文字配浅选中底）低于 WCAG AA 小字 4.5:1。若需严格无障碍，通过 ConfigProvider 加深 <code>colorPrimary</code>，或做组件级覆盖，不要发明一次性颜色。</div>
+
+        <h3>品牌与语义</h3>
+        <div class="swatches">
+          <div class="swatch"><div class="chip" style="background:#1677FF"></div><div class="meta"><strong>primary</strong><code>#1677FF</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#4096FF"></div><div class="meta"><strong>primary hover</strong><code>#4096FF</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#0958D9"></div><div class="meta"><strong>primary active / blue-7</strong><code>#0958D9</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#E6F4FF"></div><div class="meta"><strong>选中底 / info 浅底</strong><code>#E6F4FF</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#52C41A"></div><div class="meta"><strong>success</strong><code>#52C41A · 仅状态</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#FAAD14"></div><div class="meta"><strong>warning / gold</strong><code>#FAAD14</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#FF4D4F"></div><div class="meta"><strong>error</strong><code>#FF4D4F</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#1677FF"></div><div class="meta"><strong>info / blue</strong><code>#1677FF</code></div></div>
+        </div>
+
+        <h3>中性：文字与表面</h3>
+        <div class="swatches">
+          <div class="swatch"><div class="chip" style="background:#1F1F1F"></div><div class="meta"><strong>on-surface</strong><code>#1F1F1F · α 0.88</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#595959"></div><div class="meta"><strong>on-surface-variant</strong><code>#595959 · α 0.65</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#BFBFBF"></div><div class="meta"><strong>on-surface-disabled</strong><code>#BFBFBF · α 0.25</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#FFFFFF;border-bottom:1px solid #F0F0F0"></div><div class="meta"><strong>surface / elevated</strong><code>#FFFFFF</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#FAFAFA"></div><div class="meta"><strong>surface-container</strong><code>#FAFAFA</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#F5F5F5"></div><div class="meta"><strong>surface-layout</strong><code>#F5F5F5</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#D9D9D9"></div><div class="meta"><strong>outline</strong><code>#D9D9D9</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#F0F0F0"></div><div class="meta"><strong>outline-variant</strong><code>#F0F0F0</code></div></div>
+        </div>
+        <p class="note">运行时中性文字和叠层用 <code>rgba(0, 0, 0, α)</code>，而不是实心灰。原因是叠层：文字压在浅色卡片或彩色单元格上时，实心灰会切断底色，透明黑会自然混合。四级透明度：<code>0.88</code> 主文字、<code>0.65</code> 次文字、<code>0.45</code> 三级/描述、<code>0.25</code> 占位/禁用。文档中的 hex 是叠在白底上的等效结果，供静态导出；能走 alpha 的下游应优先用 <code>@ant-design/cssinjs</code> 的 <code>rgba()</code>。</p>
+        <div class="alpha-row">
+          <div class="alpha-card">
+            <div class="alpha-on-white" style="color:rgba(0,0,0,0.88)">主文字 0.88</div>
+            <div class="alpha-on-tint" style="color:rgba(0,0,0,0.88)">叠在选中底上</div>
+          </div>
+          <div class="alpha-card">
+            <div class="alpha-on-white" style="color:rgba(0,0,0,0.65)">次文字 0.65</div>
+            <div class="alpha-on-tint" style="color:rgba(0,0,0,0.65)">叠在选中底上</div>
+          </div>
+          <div class="alpha-card">
+            <div class="alpha-on-white" style="color:rgba(0,0,0,0.45)">描述文字 0.45</div>
+            <div class="alpha-on-tint" style="color:rgba(0,0,0,0.45)">叠在选中底上</div>
+          </div>
+          <div class="alpha-card">
+            <div class="alpha-on-white" style="color:rgba(0,0,0,0.25)">占位/禁用 0.25</div>
+            <div class="alpha-on-tint" style="color:rgba(0,0,0,0.25)">叠在选中底上</div>
+          </div>
+        </div>
+
+        <h3>预设色 · 只给标签、图表和分类可视化</h3>
+        <p class="lead">不要把预设色当成主操作色。状态用语义色，主操作只用 primary。<code>pink</code> 在运行时 Token 中是 <code>magenta</code> 的已弃用别名。</p>
+        <div class="swatches">
+          <div class="swatch"><div class="chip" style="background:#1677FF"></div><div class="meta"><strong>blue</strong><code>#1677FF</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#722ED1"></div><div class="meta"><strong>purple</strong><code>#722ED1</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#13C2C2"></div><div class="meta"><strong>cyan</strong><code>#13C2C2</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#52C41A"></div><div class="meta"><strong>green</strong><code>#52C41A</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#EB2F96"></div><div class="meta"><strong>magenta</strong><code>#EB2F96</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#F5222D"></div><div class="meta"><strong>red</strong><code>#F5222D</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#FA8C16"></div><div class="meta"><strong>orange</strong><code>#FA8C16</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#FADB14"></div><div class="meta"><strong>yellow</strong><code>#FADB14</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#FA541C"></div><div class="meta"><strong>volcano</strong><code>#FA541C</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#2F54EB"></div><div class="meta"><strong>geekblue</strong><code>#2F54EB</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#FAAD14"></div><div class="meta"><strong>gold</strong><code>#FAAD14</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#A0D911"></div><div class="meta"><strong>lime</strong><code>#A0D911</code></div></div>
+        </div>
+      </div>
+
+      <h2 id="type">字体</h2>
+      <div class="card">
+        <p>基础字号是 <strong>14px</strong>，不是 16。企业控制台用信息密度换取额外易读空间——1440px 宽窗口需要同时放下侧栏、顶栏、八列表格和详情。14px 正文在这些栏宽下接近约 75 字符的扫视甜点。</p>
+        <p>字体栈按系统 UI 字体优先：<code>-apple-system</code>、<code>BlinkMacSystemFont</code>、<code>Segoe UI</code>、<code>Roboto</code>、<code>Helvetica Neue</code>、<code>Arial</code>、<code>Noto Sans</code>。代码字体：<code>SFMono-Regular</code>、<code>Consolas</code>、<code>Liberation Mono</code>、<code>Menlo</code>、<code>Courier</code>。</p>
+        <p>产品界面只用<strong>两个字重</strong>：400（正文、控件、菜单项、Tab 标签）和 600（<code>fontWeightStrong</code> —— 标题、表头、任何 title 级文字）。细体（100–300）、粗体（700+）和斜体不用于界面骨架。斜体只允许出现在长文本文档里。选中/激活态的强调来自颜色和描边（边框、下划线），不是字重。</p>
+        <div class="type-row"><span>display-lg 38/600/46</span><div style="font-size:38px;line-height:46px;font-weight:600">展示级标题</div></div>
+        <div class="type-row"><span>headline-lg 30/600/38</span><div style="font-size:30px;line-height:38px;font-weight:600">企业后台标题</div></div>
+        <div class="type-row"><span>headline-md 24/600/32</span><div style="font-size:24px;line-height:32px;font-weight:600">页面中标题</div></div>
+        <div class="type-row"><span>headline-sm 20/600/28</span><div style="font-size:20px;line-height:28px;font-weight:600">区块标题</div></div>
+        <div class="type-row"><span>title-lg 16/600/24</span><div style="font-size:16px;line-height:24px;font-weight:600">卡片标题 / 导航品牌</div></div>
+        <div class="type-row"><span>title-md 14/600/22</span><div style="font-size:14px;line-height:22px;font-weight:600">表格表头 / 强调</div></div>
+        <div class="type-row"><span>body-lg 16/400/24</span><div style="font-size:16px;line-height:24px;font-weight:400">宽松正文</div></div>
+        <div class="type-row"><span>body-md 14/400/22</span><div>默认正文。企业后台用 14px，不是 16px。</div></div>
+        <div class="type-row"><span>body-sm 12/400/20</span><div style="font-size:12px;line-height:20px;color:#595959">辅助说明、标签</div></div>
+        <div class="type-row"><span>code 13/400/20</span><div class="mono">const colorPrimary = token.colorPrimary</div></div>
+      </div>
+
+      <h2 id="layout">布局</h2>
+      <div class="card">
+        <p>所有间距对齐 <strong>4px 网格</strong>。六档间距（<code>unit</code> / <code>xs</code> / <code>sm</code> / <code>md</code> / <code>lg</code> / <code>xl</code> → 4 / 4 / 8 / 16 / 24 / 32）覆盖系统中每一个间隙、槽和内边距。Token 驱动的代码里不出现魔法数字。输入框水平 11px 内边距是网格确立前的历史值；一像素迁移会牵动海量已有屏幕，因此保留。</p>
+        <div class="space-row">
+          <div class="space-box" style="width:4px;height:24px">4</div>
+          <div class="space-box" style="width:8px;height:32px">8</div>
+          <div class="space-box" style="width:16px;height:40px">16</div>
+          <div class="space-box" style="width:24px;height:48px">24</div>
+          <div class="space-box" style="width:32px;height:56px">32</div>
+        </div>
+        <p class="note" style="margin-top:16px">控件高度 <code>control-height</code> = 32px。</p>
+
+        <h3>三层表面模型</h3>
+        <p>永远不要在产品代码里写死 <code>#FFF</code> 或 <code>#FAFAFA</code>。读 Token。三层模型让暗色算法可以翻转表面阶梯而不拆布局。</p>
+        <div class="layers">
+          <p class="note" style="margin-top:0">1. bg-layout #F5F5F5 — 页面背景，包围并容纳其他一切。</p>
+          <div class="layer-container">
+            <p>2. bg-container #FFFFFF — 卡片、面板、表格、表单。大多数内容住在这里。</p>
+            <div class="layer-elevated">
+              <strong>3. bg-elevated #FFFFFF</strong>
+              <p class="note">与 container 同 hex，靠阴影区分。用于对话框、下拉、气泡。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h2 id="elevation">海拔与动效</h2>
+      <div class="card">
+        <p>Ant Design 是 <strong>flat-first</strong>。层级由边框和色调对比承担。阴影只出现在真正浮于上下文之上的表面。</p>
+        <p>阴影 Token 由 <code>colorShadow</code> 生成，同一名称可适应浅色/深色。核心档位：</p>
+        <div class="space-row" style="align-items:stretch;margin-bottom:16px">
+          <div class="shadow-box shadow-tertiary" style="flex:1">
+            <h4>Tertiary · boxShadowTertiary</h4>
+            <p class="note">轻抬起：<code>0 1px 2px 0 rgba(0,0,0,0.05), 0 1px 6px -1px rgba(0,0,0,0.03), 0 2px 4px 0 rgba(0,0,0,0.03)</code></p>
+          </div>
+          <div class="shadow-box shadow-popup" style="flex:1">
+            <h4>Popup · boxShadow / boxShadowSecondary</h4>
+            <p class="note">标准浮层：<code>0 6px 16px 0 rgba(0,0,0,0.08), 0 3px 6px -4px rgba(0,0,0,0.12), 0 9px 28px 8px rgba(0,0,0,0.05)</code></p>
+          </div>
+        </div>
+        <ul>
+          <li><strong>Card</strong>（<code>boxShadowCard</code>）— 更紧的卡片抬起阴影，用于卡片需要与容器分离时。</li>
+          <li><strong>Drawer / overflow</strong>（<code>boxShadowDrawer*</code>、<code>boxShadowTabsOverflow*</code>）— 贴边表面和滚动提示。</li>
+          <li><strong>Popover arrow</strong>（<code>boxShadowPopoverArrow</code>）— 只用于 Tooltip / Popover 小三角。</li>
+        </ul>
+        <h3>动效</h3>
+        <p>三种时长和一组 cubic-bezier，全部以 Token 暴露。不要任意挑选 <code>transition-timing-function</code>。需求对不上现有缓动时，用 <code>motionEaseInOut</code> 然后继续。</p>
+        <p class="note">悬停色块查看 0.1s / 0.2s / 0.3s。缓动名称：<code>motionEaseInOut</code>、<code>motionEaseOut</code>、<code>motionEaseIn</code>、<code>motionEaseOutBack</code>、<code>motionEaseOutCirc</code>。</p>
+        <div class="motion-row">
+          <div class="motion-box fast">Fast 0.1s<br />hover / press</div>
+          <div class="motion-box mid">Mid 0.2s<br />折叠 / 淡入</div>
+          <div class="motion-box slow">Slow 0.3s<br />对话框 / 抽屉</div>
+        </div>
+      </div>
+
+      <h2 id="shapes">形状</h2>
+      <div class="card">
+        <p>默认圆角是 <strong>6px</strong>。足够现代亲和，又小到 32px 高的按钮仍接近矩形，适合密集表单。</p>
+        <div class="radius-row">
+          <div class="radius-demo" style="border-radius:0">none 0</div>
+          <div class="radius-demo" style="border-radius:2px">sm 2</div>
+          <div class="radius-demo" style="border-radius:4px">md 4</div>
+          <div class="radius-demo" style="border-radius:6px">DEFAULT 6</div>
+          <div class="radius-demo" style="border-radius:8px">lg 8</div>
+          <div class="radius-demo" style="border-radius:16px">xl 16</div>
+          <div class="radius-demo" style="width:48px;border-radius:9999px">full</div>
+        </div>
+        <ul>
+          <li><strong>控件</strong>（按钮、输入、选择、下拉触发）— 6px（<code>rounded.DEFAULT</code>）。</li>
+          <li><strong>表面</strong>（卡片、对话框、抽屉、通知）— 8px（<code>rounded.lg</code>）。</li>
+          <li><strong>标签和小芯片</strong> — 4px（<code>rounded.md</code>）。</li>
+          <li><strong>Tooltip 和气泡</strong> — 4px（<code>rounded.md</code>）。</li>
+          <li>全胶囊（<code>rounded.full</code>，9999px）只给圆形头像、徽标和圆点，<strong>不给按钮或标签</strong>。</li>
+          <li>直角（0px）留给表格和分段控件内边。</li>
+        </ul>
+        <p class="note">相邻元素混用圆角是坏味道：8px 卡片里不该放 16px 圆角按钮。</p>
+      </div>
+
+      <h2 id="choose">组件选用</h2>
+      <div class="card">
+        <p class="lead">后台常用对照。实现时打开对应的 <code>references/components/&lt;name&gt;.md</code>，不要整份阅读官网全文快照，也不要把本页做成 72 个组件展览。</p>
+        <table class="choose">
+          <thead>
+            <tr><th>场景</th><th>用这个</th><th>不要用这个</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>主操作 / 次操作 / 危险操作</td>
+              <td>主按钮只留一个。次操作用 default / text / link。删除用 <code>danger</code> + Popconfirm。</td>
+              <td>同一决策面两个 primary。用绿色实心按钮当主操作。</td>
+            </tr>
+            <tr>
+              <td>结构化列表、排序、分页、批量</td>
+              <td><code>Table</code></td>
+              <td>用卡片宫格替代主表。用 <code>List</code> 承载八列密数据。</td>
+            </tr>
+            <tr>
+              <td>短队列、意见流、排行</td>
+              <td><code>List</code>；审批队列也可用 Table。</td>
+              <td>为排行再复制一张完整 CRUD 表。</td>
+            </tr>
+            <tr>
+              <td>只读对象摘要</td>
+              <td><code>Descriptions</code></td>
+              <td>用禁用表单冒充详情。</td>
+            </tr>
+            <tr>
+              <td>列表上新增 / 编辑</td>
+              <td>短表单用 <code>Drawer</code> 或 <code>Modal</code>。</td>
+              <td>默认再拆 <code>/new</code> 路由。表单很短却用独立页。</td>
+            </tr>
+            <tr>
+              <td>打断工作流的确认 / 决策</td>
+              <td><code>Modal</code>；驳回强制填意见。</td>
+              <td>通过 / 驳回不确认。用 Drawer 做只有两句话的确认。</td>
+            </tr>
+            <tr>
+              <td>分类、非关键状态</td>
+              <td><code>Tag</code> 或带文字的 <code>Badge</code></td>
+              <td>用 Tag 表示关键失败。圆点代替必读文字。</td>
+            </tr>
+            <tr>
+              <td>页级成功 / 警告 / 错误说明</td>
+              <td><code>Alert</code></td>
+              <td>把整页做成成功绿。用彩色正文代替图标 + 浅底。</td>
+            </tr>
+            <tr>
+              <td>加载 / 空 / 无权限 / 失败</td>
+              <td>加载 <code>Spin</code>，空 <code>Empty</code>（保留查询区），401/403/404/5xx 用不同 <code>Result</code>。</td>
+              <td>绿色骨架屏。401 和 403 收成同一句。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="components">组件外观</h2>
+      <div class="card">
+        <p class="lead">下列原型对应 YAML front-matter 中的 Token 引用。</p>
+
+        <h3>Button · primary</h3>
+        <p class="note">每个屏幕唯一的主导操作。实心主色、白字、32px 高、6px 圆角。悬停变 <code>#4096FF</code>，按下变 <code>#0958D9</code>。同一决策面不要叠两个主按钮。</p>
+        <div class="btn-row">
+          <button class="btn-primary" type="button">查询</button>
+          <button class="btn-default" type="button">重置</button>
+          <button class="btn-disabled" type="button" disabled>无权限</button>
+        </div>
+
+        <h3>Button · default</h3>
+        <p class="note">次要操作。白底透明填充、深色文字、1px 描边。悬停文字与边框变为 <code>#4096FF</code>。</p>
+
+        <h3>Input / Select</h3>
+        <p class="note">32px 高，与按钮对齐。细 1px 描边；焦点加粗主色边并带内发光。占位符用 <code>on-surface-disabled</code>。Select 在交互前看起来像 Input。</p>
+        <div class="form-row">
+          <input class="input" placeholder="请输入关键词" />
+          <select class="input" style="width:160px;padding:0 11px"><option>全部仓库</option><option>华东仓</option></select>
+        </div>
+
+        <h3>Card</h3>
+        <p class="note">工作马容器。白表面、8px 圆角、可选 <code>boxShadowCard</code>。内边距四边 24px；嵌套控件保持 16px 间隙。</p>
+        <div class="layer-container shadow-tertiary" style="max-width:360px">卡片内容区，内边距 24px。</div>
+
+        <h3>Modal</h3>
+        <p class="note">与 Card 同表面和圆角，但用次级阴影，居中叠在 <code>rgba(0,0,0,0.45)</code> 遮罩上。主体 padding 上下 20px、左右 24px。</p>
+        <div class="modal-stage">
+          <div class="modal-mask"></div>
+          <div class="modal-panel">
+            <h4 style="margin-top:0">确认提交</h4>
+            <p class="note">对话框示范：elevated 表面 + popup 阴影 + 45% 遮罩。</p>
+            <div class="btn-row">
+              <button class="btn-primary" type="button">确定</button>
+              <button class="btn-default" type="button">取消</button>
+            </div>
+          </div>
+        </div>
+
+        <h3>Menu · 选中项</h3>
+        <p class="note"><code>#E6F4FF</code> 背景 + 主色文字。这是导航里“你在这里”的唯一视觉线索。</p>
+        <div class="menu">
+          <div class="menu-item selected">库存查询</div>
+          <div class="menu-item">出入库</div>
+          <div class="menu-item">盘点任务</div>
+        </div>
+
+        <h3>Tabs · 激活项</h3>
+        <p class="note">主色文字 + 2px 主色下划线。未激活为 <code>on-surface-variant</code>。任何状态下 Tab 都没有背景填充。</p>
+        <div class="tabs">
+          <button class="tab active" type="button">概览</button>
+          <button class="tab" type="button">明细</button>
+          <button class="tab" type="button">日志</button>
+        </div>
+
+        <h3>Table · 表头</h3>
+        <p class="note"><code>surface-container</code> 背景，<code>title-md</code>（14px / 600）。表体只在悬停时变底，默认不做斑马纹——系统相信用户能读密集数据。</p>
+        <table>
+          <thead><tr><th>名称</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr><td>劳保手套</td><td><span class="tag tag-green">正常</span></td><td><a href="#components">详情</a></td></tr>
+            <tr><td>扫描枪</td><td><span class="tag tag-blue">盘点中</span></td><td><a href="#components">详情</a></td></tr>
+          </tbody>
+        </table>
+
+        <h3>Tag</h3>
+        <p class="note">小分类标签。4px 圆角、12px 字、低饱和粉彩来自预设色板。关键状态不要用 Tag，用 Alert 或 Badge。</p>
+        <div class="btn-row">
+          <span class="tag">默认</span>
+          <span class="tag tag-blue">分类 · blue</span>
+          <span class="tag tag-green">分类 · 非状态主操作</span>
+        </div>
+
+        <h3>Alert</h3>
+        <p class="note">语义反馈表面。成功/警告/错误/信息用浅语义底 + 正常文字色；状态由图标和底色传达，不用低对比的彩色正文。</p>
+        <div class="alert alert-success">成功：只用 success 绿提示结果，不要把整页做成绿色。</div>
+        <div class="alert alert-warning">警告：空数据用 Empty，保留查询区。</div>
+        <div class="alert alert-error">错误：用 Result；401 和 403 分开。</div>
+        <div class="alert alert-info">信息：加载中用 Spin，不要换一套绿色骨架屏。</div>
+
+        <h3>Badge status</h3>
+        <p class="note">紧凑状态点。危急可用 error 填充，但在无障碍关键流程里圆点不能代替文字。</p>
+        <p><span class="badge"></span> 故障 &nbsp; <span class="badge" style="background:#52C41A"></span> 正常 &nbsp; <span class="badge" style="background:#FAAD14"></span> 降级</p>
+
+        <h3>Tooltip</h3>
+        <p class="note">高对比反相表面：<code>rgba(0,0,0,0.85)</code> 底、白字。始终由框架定位，不要手动钉死。</p>
+        <span class="tooltip">保存后立即生效</span>
+
+        <h3>Dropdown · 项悬停</h3>
+        <p class="note">悬停用 <code>surface-container</code> 填充，<strong>不改文字色</strong>。悬停提示本身已经足够。</p>
+        <div class="dropdown">
+          <div class="dropdown-item">编辑</div>
+          <div class="dropdown-item">导出</div>
+          <div class="dropdown-item">删除</div>
+        </div>
+      </div>
+
+      <h2 id="rules">对与错</h2>
+      <div class="compare">
+        <div class="ok">
+          <h3>做</h3>
+          <p>用四个设计价值观当平局裁决。两种做法冲突时，更能让用户状态确定、更易读的那个胜出。</p>
+          <p>从 <code>colors.surface</code>、<code>surface-container</code>、<code>surface-layout</code> 读表面。它们对应三层模型。</p>
+          <p>找不到更具体 Token 时，组件级过渡用 <code>motionDurationMid</code>（0.2s）。</p>
+          <p>预设色板（blue 到 lime）只留给标签、图表和分类可视化。</p>
+          <p>每一个间隙、内边距和槽都通过间距刻度对齐 4px 网格。</p>
+        </div>
+        <div class="bad">
+          <h3>不做</h3>
+          <p>同一表面不要叠两个主色按钮。只留一个，其余降为 default。</p>
+          <p>不要硬编码 <code>#FFFFFF</code> 或 <code>#FAFAFA</code>。hex 是附带结果，角色才重要。</p>
+          <p>不要发明自定义 <code>cubic-bezier</code>。用已命名缓动。</p>
+          <p>不要在预设色板外铸造强调色给一次性 UI。若某屏看起来需要，多半该改布局。</p>
+          <p>不要在产品代码里用魔法数字。刻度缺一档时，该重看设计，而不是一像素覆盖。</p>
+        </div>
+      </div>
+      <div class="card">
+        <p class="lead">PKUSE 叠加：不要用 <code>#12372a</code> / <code>#176b4d</code> 做顶栏或品牌块，也不要把页面底改成 <code>#f2f5f2</code> 这类绿灰。成功绿只出现在 Tag、Alert、状态点。</p>
+      </div>
+
+      <h2 id="customize">定制</h2>
+      <div class="card">
+        <p>YAML 中的每个值都是 <code>defaultAlgorithm</code> 产出的<strong>默认值</strong>——浅色主题。Ant Design 主题化比替换 Design Token 更广：包含算法派生、组件级覆盖、动态切换、嵌套主题作用域、CSS 变量输出、静态 Token 消费，以及零运行时 CSS 提取。完整运行时 API 见 <a href="https://ant.design/docs/react/customize-theme">Customize Theme</a>。</p>
+        <p>主题配置入口是 <code>ConfigProvider</code> 的 <code>theme</code>：</p>
+        <ol class="steps">
+          <li><strong>Seed token 覆盖。</strong>传 <code>theme.token</code> 替换任意种子。主色和语义色种子会展开为派生阶梯；<code>colorBgBase</code> 与 <code>colorTextBase</code> 驱动中性表面和文字。间距、圆角、字号种子同理。</li>
+          <li><strong>算法切换。</strong>设 <code>theme.algorithm</code> 换派生逻辑。<code>defaultAlgorithm</code>、<code>darkAlgorithm</code>、<code>compactAlgorithm</code> 可单独或组成数组使用——不要手工反色；算法会处理非线性的色板、表面、阴影和尺寸关系。</li>
+          <li><strong>组件级覆盖。</strong><code>theme.components.Button</code>（或任一组件 Token 命名空间）可覆盖单个组件的 Component Token 和所消费的 Alias Token，不影响其他组件。组件配置里的 <code>algorithm</code> 可让该覆盖仍跟随种子关系。</li>
+          <li><strong>运行时作用域。</strong>改 <code>ConfigProvider.theme</code> 可动态切换；嵌套 ConfigProvider 创建局部主题，未改的 Token 从父级继承。静态 API（<code>message.xxx</code>、<code>Modal.xxx</code>、<code>notification.xxx</code>）不会自动拿到周围上下文；需要主题化静态反馈时，用 hook API、<code>App</code> 或显式 context holder。</li>
+          <li><strong>Token 消费与输出。</strong>React 内用 <code>theme.useToken()</code>，React 外用 <code>theme.getDesignToken()</code>。需要 CSS 变量时用 <code>theme.cssVar</code>；必须关闭运行时样式生成时用 <code>theme.zeroRuntime</code> 配合预构建或提取的 CSS。</li>
+        </ol>
+        <p>自定义主题时，先保住 Ant Design 的交互结构、密度、状态反馈和组件语义，再改最小必要种子集：通常是 <code>colorPrimary</code>、状态色、<code>borderRadius</code>、<code>fontFamily</code>、<code>fontSize</code> 和中性表面基色。品牌页可以看起来不同，但表单、表格、导航、浮层、焦点态和校验反馈仍应像 Ant Design。避免生成绕过 Token、算法、<code>theme.components</code>、CSS 变量或提取静态样式的自定义 CSS；若主题无法通过这些官方层表达，应视为设计系统扩展，而不是页面一次性样式。</p>
+        <p class="note">PKUSE 第一版：不改品牌种子。生成应用通过 ConfigProvider 锁定默认主色 <code>#1677FF</code>，并用应用级 <code>prefixCls</code> 与 CSS Variable key。</p>
+<pre>theme.token = {
+  colorPrimary: '#1677FF',
+  colorSuccess: '#52C41A',
+  colorWarning: '#FAAD14',
+  colorError: '#FF4D4F',
+  colorInfo: '#1677FF',
+  fontSize: 14,
+  borderRadius: 6,
+}</pre>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

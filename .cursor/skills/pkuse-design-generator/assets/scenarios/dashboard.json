@@ -1,0 +1,13 @@
+{
+  "scene": "dashboard",
+  "routes": ["overview"],
+  "patterns": [
+    "metric-cards",
+    "trends",
+    "ranking",
+    "dimension-filters",
+    "anomaly-list"
+  ],
+  "states": ["loading", "empty", "error", "forbidden", "partial-error", "refresh"],
+  "permissions": ["view", "export"]
+}

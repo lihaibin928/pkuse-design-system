@@ -1,0 +1,24 @@
+{
+  "scene": "system-config",
+  "routes": ["organization", "users", "roles", "permissions", "parameters"],
+  "patterns": [
+    "org-tree",
+    "user-table",
+    "role-editor",
+    "permission-matrix",
+    "parameter-form"
+  ],
+  "states": ["loading", "empty", "error", "forbidden"],
+  "permissions": [
+    "org-view",
+    "org-edit",
+    "users-view",
+    "users-edit",
+    "roles-view",
+    "roles-edit",
+    "permissions-view",
+    "permissions-edit",
+    "params-view",
+    "params-edit"
+  ]
+}
