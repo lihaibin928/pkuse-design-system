@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import importlib.util
 import json
-import os
 import re
 import sys
 import unittest
@@ -26,20 +25,27 @@ assert SCAFFOLD_SPEC and SCAFFOLD_SPEC.loader
 sys.modules[SCAFFOLD_SPEC.name] = SCAFFOLD
 SCAFFOLD_SPEC.loader.exec_module(SCAFFOLD)
 
-REAL_ADAPTER = """
-import type { Root } from "react-dom/client";
-let root: Root | undefined;
-function disposeResources(props: unknown, mountedRoot: Root | undefined): void {
-  mountedRoot?.unmount();
+REAL_APP_TS = """
+export const qiankun = {
+  async bootstrap() {},
+  async mount() {},
+  async unmount() {},
+};
+export async function getInitialState() {
+  return { name: "app" };
 }
-function disposeCurrent(): void {
-  const mountedRoot = root;
-  root = undefined;
-  disposeResources(undefined, mountedRoot);
-}
-export async function bootstrap(): Promise<void> {}
-export async function mount(): Promise<void> {}
-export async function unmount(): Promise<void> { disposeCurrent(); }
+export const layout = () => ({
+  menuRender: false,
+  menuHeaderRender: false,
+});
+""".strip()
+
+REAL_UMIRC = """
+export default {
+  antd: {},
+  access: {},
+  qiankun: { slave: {} },
+};
 """.strip()
 
 
@@ -54,50 +60,30 @@ def _write_package_json(project: Path, scripts: dict[str, str] | None = None) ->
     )
 
 
-def _write_lifecycle_adapter(adapter_path: Path, *, body: str) -> None:
-    adapter_path.parent.mkdir(parents=True, exist_ok=True)
-    adapter_path.write_text(body, encoding="utf-8")
+def _write_umirc(project: Path, body: str | None = None) -> None:
+    (project / ".umirc.ts").write_text(body or REAL_UMIRC, encoding="utf-8")
+
+
+def _write_app_runtime(project: Path, body: str | None = None) -> None:
+    src = project / "src"
+    src.mkdir(parents=True, exist_ok=True)
+    (src / "app.ts").write_text(body or REAL_APP_TS, encoding="utf-8")
 
 
 def _write_contract_compliant_project(project: Path) -> None:
-    _write_lifecycle_adapter(project / "src/micro-app/adapter.tsx", body=REAL_ADAPTER)
-    (project / "src/auth").mkdir(parents=True, exist_ok=True)
-    (project / "src/app").mkdir(parents=True, exist_ok=True)
-    (project / "src/routes").mkdir(parents=True, exist_ok=True)
-    (project / "src/auth/permissions.ts").write_text(
-        'export const PERMISSIONS = { HOME_VIEW: "home:view", ENTITY_EDIT: "entity:edit" } as const;\n',
+    _write_package_json(project, {"build": "exit 0"})
+    _write_umirc(project)
+    _write_app_runtime(project)
+    (project / "src/router").mkdir(parents=True, exist_ok=True)
+    (project / "src/access.ts").write_text(
+        "export default () => ({ canViewUser: true, canEditUser: true });\n",
         encoding="utf-8",
     )
-    (project / "src/app/App.tsx").write_text(
+    (project / "src/router/routes.ts").write_text(
         """
-import { ConfigProvider } from "antd";
-import { Routes } from "react-router-dom";
-import { createRouteManifest, buildVisibleMenu, canAccessRoute } from "../routes/manifest";
-export function App() {
-  const manifest = createRouteManifest({});
-  const menu = buildVisibleMenu(manifest, []);
-  return (
-    <ConfigProvider>
-      <Routes>
-        {manifest.map((route) => (
-          <span key={route.path}>{canAccessRoute(route, []) ? route.title : "deny"}</span>
-        ))}
-        {menu.length}
-      </Routes>
-    </ConfigProvider>
-  );
-}
-""".strip(),
-        encoding="utf-8",
-    )
-    (project / "src/routes/manifest.tsx").write_text(
-        """
-import { PERMISSIONS } from "../auth/permissions";
-export function createRouteManifest() {
-  return [{ path: "/", permissions: [PERMISSIONS.HOME_VIEW], menu: { order: 1 } }];
-}
-export function buildVisibleMenu(manifest) { return manifest; }
-export function canAccessRoute(route, permissions) { return true; }
+export default [
+  { path: "/user/list", component: "./User/UserList", access: "canViewUser" },
+];
 """.strip(),
         encoding="utf-8",
     )
@@ -105,23 +91,26 @@ export function canAccessRoute(route, permissions) { return true; }
     home.parent.mkdir(parents=True, exist_ok=True)
     home.write_text(
         """
+import { Access, useAccess } from "@umijs/max";
 import { Button, Empty, Result, Spin } from "antd";
 import { useEffect, useState } from "react";
-import { can } from "../../auth/access";
-import { PERMISSIONS } from "../../auth/permissions";
-export function HomePage({ service, permissions = [] }) {
+export function HomePage({ service }) {
+  const access = useAccess();
   const [state, setState] = useState("loading");
   useEffect(() => { void service.list(); }, [service]);
   if (state === "loading") { return <Spin tip="loading" />; }
   if (state === "forbidden") { return <Result status="403" title="denied" />; }
   if (state === "error") { return <Result status="error" title="failed" />; }
   if (state === "empty") { return <Empty description="none" />; }
-  return <Button disabled={!can(permissions, PERMISSIONS.ENTITY_EDIT)}>Edit</Button>;
+  return (
+    <Access accessible={access.canEditUser}>
+      <Button>Edit</Button>
+    </Access>
+  );
 }
 """.strip(),
         encoding="utf-8",
     )
-    _write_package_json(project, {"typecheck": "exit 0", "test": "exit 0", "build": "exit 0"})
 
 
 class TokenizerTest(unittest.TestCase):
@@ -167,13 +156,14 @@ class TokenizerTest(unittest.TestCase):
 
 
 class ValidateTest(unittest.TestCase):
-    def test_rejects_comment_pseudo_exports(self) -> None:
+    def test_rejects_comment_pseudo_lifecycle_exports(self) -> None:
         with TemporaryDirectory() as temp:
             project = Path(temp)
             _write_package_json(project)
-            _write_lifecycle_adapter(
-                project / "src/micro-app/adapter.tsx",
-                body="// export async function bootstrap() {}\n",
+            _write_umirc(project)
+            _write_app_runtime(
+                project,
+                body="// export const qiankun = { async bootstrap() {}, async mount() {}, async unmount() {} }\n",
             )
             report = MODULE.validate(project, run_commands=False)
             self.assertTrue(any("lifecycle exports are incomplete" in item for item in report.errors))
@@ -182,422 +172,59 @@ class ValidateTest(unittest.TestCase):
         with TemporaryDirectory() as temp:
             project = Path(temp)
             _write_package_json(project)
-            _write_lifecycle_adapter(
-                project / "src/micro-app/adapter.tsx",
-                body='const bootstrap = "export async function bootstrap(){}";',
+            _write_umirc(project)
+            _write_app_runtime(
+                project,
+                body='const note = "export const qiankun = { async bootstrap() {} }";\n',
             )
             report = MODULE.validate(project, run_commands=False)
             self.assertTrue(any("lifecycle exports are incomplete" in item for item in report.errors))
 
-    def test_rejects_undefined_root_argument_chain(self) -> None:
+    def test_rejects_missing_qiankun_slave(self) -> None:
         with TemporaryDirectory() as temp:
             project = Path(temp)
-            _write_package_json(project)
-            _write_lifecycle_adapter(
-                project / "src/micro-app/adapter.tsx",
-                body="""
-function disposeResources(p, mountedRoot) { mountedRoot?.unmount(); }
-function disposeCurrent() { const mountedRoot = root; root = undefined; disposeResources(undefined, undefined); }
-export async function bootstrap() {}
-export async function mount() {}
-export async function unmount() { disposeCurrent(); }
-""".strip(),
-            )
+            _write_contract_compliant_project(project)
+            _write_umirc(project, body="export default { antd: {}, access: {} };\n")
             report = MODULE.validate(project, run_commands=False)
-            self.assertTrue(any("disposeCurrent" in item for item in report.errors))
+            self.assertTrue(any("qiankun slave config is missing" in item for item in report.errors))
 
-    def test_rejects_plain_object_root_argument_chain(self) -> None:
-        with TemporaryDirectory() as temp:
-            project = Path(temp)
-            _write_package_json(project)
-            _write_lifecycle_adapter(
-                project / "src/micro-app/adapter.tsx",
-                body="""
-function disposeResources(p, mountedRoot) { mountedRoot?.unmount(); }
-function disposeCurrent() { const mountedRoot = root; root = undefined; disposeResources(undefined, { unmount() {} }); }
-export async function bootstrap() {}
-export async function mount() {}
-export async function unmount() { disposeCurrent(); }
-""".strip(),
-            )
-            report = MODULE.validate(project, run_commands=False)
-            self.assertTrue(any("disposeCurrent" in item for item in report.errors))
-
-    def test_accepts_real_root_cleanup_chain(self) -> None:
+    def test_accepts_real_qiankun_runtime(self) -> None:
         with TemporaryDirectory() as temp:
             project = Path(temp)
             _write_contract_compliant_project(project)
             report = MODULE.validate(project, run_commands=False)
             self.assertEqual([], report.errors, msg="\n".join(report.errors))
 
-    def test_accepts_direct_root_unmount(self) -> None:
+    def test_rejects_comment_pseudo_antd_plugin(self) -> None:
         with TemporaryDirectory() as temp:
             project = Path(temp)
-            _write_package_json(project)
-            _write_lifecycle_adapter(
-                project / "src/micro-app/adapter.tsx",
+            _write_contract_compliant_project(project)
+            _write_umirc(
+                project,
                 body="""
-export async function bootstrap() {}
-export async function mount() {}
-export async function unmount() { root?.unmount(); }
+export default {
+  // antd: {},
+  qiankun: { slave: {} },
+  access: {},
+};
 """.strip(),
             )
             report = MODULE.validate(project, run_commands=False)
-            lifecycle = [item for item in report.errors if "unmount in src/micro-app" in item]
-            self.assertEqual([], lifecycle)
+            self.assertTrue(any("antd plugin" in item for item in report.errors))
 
-    def test_rejects_string_pseudo_config_provider(self) -> None:
+    def test_rejects_string_pseudo_antd_plugin(self) -> None:
         with TemporaryDirectory() as temp:
             project = Path(temp)
             _write_contract_compliant_project(project)
-            (project / "src/app/App.tsx").write_text(
-                'export function App() { const tag = "<ConfigProvider>"; return tag; }\n',
-                encoding="utf-8",
-            )
-            report = MODULE.validate(project, run_commands=False)
-            self.assertTrue(any("ConfigProvider from antd" in item for item in report.errors))
-
-    def test_rejects_self_closing_config_provider(self) -> None:
-        with TemporaryDirectory() as temp:
-            project = Path(temp)
-            _write_contract_compliant_project(project)
-            (project / "src/app/App.tsx").write_text(
-                """
-import { ConfigProvider } from "antd";
-import { createRouteManifest, buildVisibleMenu, canAccessRoute } from "../routes/manifest";
-export function App() {
-  const manifest = createRouteManifest({});
-  const menu = buildVisibleMenu(manifest, []);
-  return <ConfigProvider />;
-}
+            _write_umirc(
+                project,
+                body="""
+const note = "antd: {}";
+export default { qiankun: { slave: {} }, access: {} };
 """.strip(),
-                encoding="utf-8",
             )
             report = MODULE.validate(project, run_commands=False)
-            self.assertTrue(any("ConfigProvider from antd" in item for item in report.errors))
-
-    def test_rejects_local_config_provider_function(self) -> None:
-        with TemporaryDirectory() as temp:
-            project = Path(temp)
-            _write_contract_compliant_project(project)
-            (project / "src/app/App.tsx").write_text(
-                """
-import { ConfigProvider } from "antd";
-function ConfigProvider() { return null; }
-export function App() { return <ConfigProvider></ConfigProvider>; }
-""".strip(),
-                encoding="utf-8",
-            )
-            report = MODULE.validate(project, run_commands=False)
-            self.assertTrue(any("ConfigProvider from antd" in item for item in report.errors))
-
-    def test_accepts_config_provider_alias_from_antd(self) -> None:
-        with TemporaryDirectory() as temp:
-            project = Path(temp)
-            _write_contract_compliant_project(project)
-            (project / "src/app/App.tsx").write_text(
-                """
-import { ConfigProvider as AntConfigProvider } from "antd";
-import { Routes } from "react-router-dom";
-import { createRouteManifest, buildVisibleMenu, canAccessRoute } from "../routes/manifest";
-export function App() {
-  const manifest = createRouteManifest({});
-  const menu = buildVisibleMenu(manifest, []);
-  return (
-    <AntConfigProvider>
-      <Routes>
-        {manifest.map((route) => (
-          <span key={route.path}>{canAccessRoute(route, []) ? route.title : "deny"}</span>
-        ))}
-        {menu.length}
-      </Routes>
-    </AntConfigProvider>
-  );
-}
-""".strip(),
-                encoding="utf-8",
-            )
-            report = MODULE.validate(project, run_commands=False)
-            config_errors = [item for item in report.errors if "ConfigProvider from antd" in item]
-            self.assertEqual([], config_errors)
-
-    def test_accepts_default_named_antd_config_provider_import(self) -> None:
-        with TemporaryDirectory() as temp:
-            project = Path(temp)
-            _write_contract_compliant_project(project)
-            (project / "src/app/App.tsx").write_text(
-                """
-import antd, { ConfigProvider } from "antd";
-import { Routes } from "react-router-dom";
-import { createRouteManifest, buildVisibleMenu, canAccessRoute } from "../routes/manifest";
-export function App() {
-  const manifest = createRouteManifest({});
-  const menu = buildVisibleMenu(manifest, []);
-  void antd;
-  return (
-    <ConfigProvider>
-      <Routes>
-        {manifest.map((route) => (
-          <span key={route.path}>{canAccessRoute(route, []) ? route.title : "deny"}</span>
-        ))}
-        {menu.length}
-      </Routes>
-    </ConfigProvider>
-  );
-}
-""".strip(),
-                encoding="utf-8",
-            )
-            report = MODULE.validate(project, run_commands=False)
-            config_errors = [item for item in report.errors if "ConfigProvider from antd" in item]
-            self.assertEqual([], config_errors)
-
-    def test_rejects_empty_config_provider_wrapper(self) -> None:
-        with TemporaryDirectory() as temp:
-            project = Path(temp)
-            _write_contract_compliant_project(project)
-            (project / "src/app/App.tsx").write_text(
-                """
-import { ConfigProvider } from "antd";
-import { createRouteManifest, buildVisibleMenu, canAccessRoute } from "../routes/manifest";
-export function App() {
-  void createRouteManifest;
-  void buildVisibleMenu;
-  void canAccessRoute;
-  return <ConfigProvider></ConfigProvider>;
-}
-""".strip(),
-                encoding="utf-8",
-            )
-            report = MODULE.validate(project, run_commands=False)
-            self.assertTrue(any("ConfigProvider from antd" in item for item in report.errors))
-
-    def test_rejects_whitespace_only_config_provider_wrapper(self) -> None:
-        with TemporaryDirectory() as temp:
-            project = Path(temp)
-            _write_contract_compliant_project(project)
-            (project / "src/app/App.tsx").write_text(
-                """
-import { ConfigProvider } from "antd";
-export function App() { return <ConfigProvider>   </ConfigProvider>; }
-""".strip(),
-                encoding="utf-8",
-            )
-            report = MODULE.validate(project, run_commands=False)
-            self.assertTrue(any("ConfigProvider from antd" in item for item in report.errors))
-
-    def test_rejects_parallel_app_content_outside_provider(self) -> None:
-        with TemporaryDirectory() as temp:
-            project = Path(temp)
-            _write_contract_compliant_project(project)
-            (project / "src/app/App.tsx").write_text(
-                """
-import { ConfigProvider } from "antd";
-import { createRouteManifest, buildVisibleMenu, canAccessRoute } from "../routes/manifest";
-function AppContent() { return <div>content</div>; }
-export function App() {
-  void createRouteManifest;
-  void buildVisibleMenu;
-  void canAccessRoute;
-  return (
-    <>
-      <ConfigProvider></ConfigProvider>
-      <AppContent />
-    </>
-  );
-}
-""".strip(),
-                encoding="utf-8",
-            )
-            report = MODULE.validate(project, run_commands=False)
-            self.assertTrue(any("ConfigProvider from antd" in item for item in report.errors))
-
-    def test_accepts_config_provider_wrapping_app_content(self) -> None:
-        with TemporaryDirectory() as temp:
-            project = Path(temp)
-            _write_contract_compliant_project(project)
-            (project / "src/app/App.tsx").write_text(
-                """
-import { ConfigProvider } from "antd";
-import { createRouteManifest, buildVisibleMenu, canAccessRoute } from "../routes/manifest";
-function AppContent({ manifest, menu }) {
-  return (
-    <div>
-      {manifest.map((route) => (
-        <span key={route.path}>{canAccessRoute(route, []) ? route.title : "deny"}</span>
-      ))}
-      {menu.length}
-    </div>
-  );
-}
-export function App() {
-  const manifest = createRouteManifest({});
-  const menu = buildVisibleMenu(manifest, []);
-  return (
-    <ConfigProvider>
-      <AppContent manifest={manifest} menu={menu} />
-    </ConfigProvider>
-  );
-}
-""".strip(),
-                encoding="utf-8",
-            )
-            report = MODULE.validate(project, run_commands=False)
-            config_errors = [item for item in report.errors if "ConfigProvider from antd" in item]
-            self.assertEqual([], config_errors)
-
-    def test_rejects_config_provider_with_span_placeholder(self) -> None:
-        with TemporaryDirectory() as temp:
-            project = Path(temp)
-            _write_contract_compliant_project(project)
-            (project / "src/app/App.tsx").write_text(
-                """
-import { ConfigProvider } from "antd";
-import { createRouteManifest, buildVisibleMenu, canAccessRoute } from "../routes/manifest";
-function AppContent() { return <div>content</div>; }
-export function App() {
-  void createRouteManifest;
-  void buildVisibleMenu;
-  void canAccessRoute;
-  return (
-    <>
-      <ConfigProvider><span /></ConfigProvider>
-      <AppContent />
-    </>
-  );
-}
-""".strip(),
-                encoding="utf-8",
-            )
-            report = MODULE.validate(project, run_commands=False)
-            self.assertTrue(any("ConfigProvider from antd" in item for item in report.errors))
-
-    def test_rejects_config_provider_with_only_antd_app(self) -> None:
-        with TemporaryDirectory() as temp:
-            project = Path(temp)
-            _write_contract_compliant_project(project)
-            (project / "src/app/App.tsx").write_text(
-                """
-import { App as AntdApp, ConfigProvider } from "antd";
-import { createRouteManifest, buildVisibleMenu, canAccessRoute } from "../routes/manifest";
-export function App() {
-  void createRouteManifest;
-  void buildVisibleMenu;
-  void canAccessRoute;
-  return (
-    <ConfigProvider>
-      <AntdApp><div>placeholder</div></AntdApp>
-    </ConfigProvider>
-  );
-}
-""".strip(),
-                encoding="utf-8",
-            )
-            report = MODULE.validate(project, run_commands=False)
-            self.assertTrue(any("ConfigProvider from antd" in item for item in report.errors))
-
-    def test_accepts_config_provider_with_router_provider_outlet(self) -> None:
-        with TemporaryDirectory() as temp:
-            project = Path(temp)
-            _write_contract_compliant_project(project)
-            (project / "src/app/App.tsx").write_text(
-                """
-import { ConfigProvider } from "antd";
-import { createRouteManifest, buildVisibleMenu, canAccessRoute } from "../routes/manifest";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-export function App() {
-  void createRouteManifest;
-  void buildVisibleMenu;
-  void canAccessRoute;
-  const router = createBrowserRouter([{ path: "/", element: <div /> }]);
-  return (
-    <ConfigProvider>
-      <RouterProvider router={router} />
-    </ConfigProvider>
-  );
-}
-""".strip(),
-                encoding="utf-8",
-            )
-            report = MODULE.validate(project, run_commands=False)
-            config_errors = [item for item in report.errors if "ConfigProvider from antd" in item]
-            self.assertEqual([], config_errors)
-
-    def test_accepts_config_provider_with_routes_outlet(self) -> None:
-        with TemporaryDirectory() as temp:
-            project = Path(temp)
-            _write_contract_compliant_project(project)
-            (project / "src/app/App.tsx").write_text(
-                """
-import { ConfigProvider } from "antd";
-import { Routes, Route } from "react-router-dom";
-import { createRouteManifest, buildVisibleMenu, canAccessRoute } from "../routes/manifest";
-export function App() {
-  const manifest = createRouteManifest({});
-  const menu = buildVisibleMenu(manifest, []);
-  return (
-    <ConfigProvider>
-      <Routes>
-        <Route path="/" element={<div>{menu.length}</div>} />
-      </Routes>
-    </ConfigProvider>
-  );
-}
-""".strip(),
-                encoding="utf-8",
-            )
-            report = MODULE.validate(project, run_commands=False)
-            config_errors = [item for item in report.errors if "ConfigProvider from antd" in item]
-            self.assertEqual([], config_errors)
-
-    def test_accepts_config_provider_with_children_prop_outlet(self) -> None:
-        with TemporaryDirectory() as temp:
-            project = Path(temp)
-            _write_contract_compliant_project(project)
-            (project / "src/app/App.tsx").write_text(
-                """
-import { ConfigProvider } from "antd";
-import { createRouteManifest, buildVisibleMenu, canAccessRoute } from "../routes/manifest";
-export function App({ children }: { children: React.ReactNode }) {
-  void createRouteManifest;
-  void buildVisibleMenu;
-  void canAccessRoute;
-  return <ConfigProvider>{children}</ConfigProvider>;
-}
-""".strip(),
-                encoding="utf-8",
-            )
-            report = MODULE.validate(project, run_commands=False)
-            config_errors = [item for item in report.errors if "ConfigProvider from antd" in item]
-            self.assertEqual([], config_errors)
-
-    def test_rejects_comment_pseudo_antd_import(self) -> None:
-        with TemporaryDirectory() as temp:
-            project = Path(temp)
-            _write_contract_compliant_project(project)
-            (project / "src/app/App.tsx").write_text(
-                """
-// import { ConfigProvider } from "antd";
-export function App() { return <ConfigProvider></ConfigProvider>; }
-""".strip(),
-                encoding="utf-8",
-            )
-            report = MODULE.validate(project, run_commands=False)
-            self.assertTrue(any("ConfigProvider from antd" in item for item in report.errors))
-
-    def test_rejects_string_pseudo_antd_import(self) -> None:
-        with TemporaryDirectory() as temp:
-            project = Path(temp)
-            _write_contract_compliant_project(project)
-            (project / "src/app/App.tsx").write_text(
-                """
-const note = 'import { ConfigProvider } from "antd"';
-export function App() { return <div>{note}</div>; }
-""".strip(),
-                encoding="utf-8",
-            )
-            report = MODULE.validate(project, run_commands=False)
-            self.assertTrue(any("ConfigProvider from antd" in item for item in report.errors))
+            self.assertTrue(any("antd plugin" in item for item in report.errors))
 
     def test_reports_tsx_style_inline_color(self) -> None:
         with TemporaryDirectory() as temp:
@@ -879,7 +506,7 @@ export function ReportsPage({ service }) {
                 encoding="utf-8",
             )
             report = MODULE.validate(project, run_commands=False)
-            self.assertTrue(any("ReportsPage.tsx missing JSX baseline states" in item for item in report.errors))
+            self.assertTrue(any("feature reports missing JSX baseline states" in item for item in report.errors))
 
     def test_rejects_forbidden_error_import_without_jsx_state(self) -> None:
         with TemporaryDirectory() as temp:
@@ -907,32 +534,30 @@ export function HomePage({ service }) {
                 any("missing JSX baseline states" in item and "forbidden" in item for item in report.errors)
             )
 
-    def test_reports_missing_rbac_manifest_permissions(self) -> None:
+    def test_reports_missing_route_access_flags(self) -> None:
         with TemporaryDirectory() as temp:
             project = Path(temp)
             _write_contract_compliant_project(project)
-            (project / "src/routes/manifest.tsx").write_text(
-                "export function createRouteManifest() { return [{ permissions: ['home:view'] }]; }\n"
-                "export function buildVisibleMenu(m) { return m; }\n"
-                "export function canAccessRoute() { return true; }\n",
+            (project / "src/router/routes.ts").write_text(
+                "export default [{ path: '/user/list', component: './User/UserList' }];\n",
                 encoding="utf-8",
             )
             report = MODULE.validate(project, run_commands=False)
-            self.assertTrue(any("permissions: [PERMISSIONS" in item for item in report.errors))
+            self.assertTrue(any("access: flags" in item for item in report.errors))
 
     def test_token_scan_includes_scripts_and_excludes_node_modules(self) -> None:
         with TemporaryDirectory() as temp:
             project = Path(temp)
             _write_contract_compliant_project(project)
             (project / "scripts").mkdir(exist_ok=True)
-            (project / "scripts/verify-build-base.mjs").write_text(
+            (project / "scripts/leftover.mjs").write_text(
                 'const token = "__APP_NAME__";\n',
                 encoding="utf-8",
             )
             (project / "node_modules/fake/__APP_NAME__.ts").parent.mkdir(parents=True)
             (project / "node_modules/fake/__APP_NAME__.ts").write_text("token", encoding="utf-8")
             report = MODULE.validate(project, run_commands=False)
-            self.assertTrue(any("scripts/verify-build-base.mjs" in item for item in report.errors))
+            self.assertTrue(any("scripts/leftover.mjs" in item for item in report.errors))
             self.assertFalse(any("node_modules" in item for item in report.errors))
 
     def test_missing_src_reports_clear_error(self) -> None:
@@ -957,7 +582,7 @@ export function HomePage({ service }) {
             report = MODULE.validate(project, run_commands=False)
             self.assertEqual([], report.errors, msg="\n".join(report.errors))
 
-    def test_pnpm_not_found_reports_clear_error(self) -> None:
+    def test_yarn_not_found_reports_clear_error(self) -> None:
         with TemporaryDirectory() as temp:
             project = Path(temp)
             _write_contract_compliant_project(project)
@@ -966,45 +591,39 @@ export function HomePage({ service }) {
             with patch.object(MODULE.shutil, "which", which_mock):
                 with patch.object(MODULE.subprocess, "run", run_mock):
                     report = MODULE.validate(project, run_commands=True)
-            self.assertTrue(any("pnpm is not available" in item for item in report.errors))
-            which_mock.assert_called_once_with("pnpm")
+            self.assertTrue(any("yarn is not available" in item for item in report.errors))
+            which_mock.assert_called_once_with("yarn")
             run_mock.assert_not_called()
 
     def test_missing_script_reports_clear_error(self) -> None:
         with TemporaryDirectory() as temp:
             project = Path(temp)
             _write_contract_compliant_project(project)
-            (project / "package.json").write_text('{"scripts": {"test": "exit 0"}}', encoding="utf-8")
-            which_mock = Mock(return_value="/usr/bin/pnpm")
+            (project / "package.json").write_text('{"scripts": {"dev": "exit 0"}}', encoding="utf-8")
+            which_mock = Mock(return_value="/usr/bin/yarn")
             run_mock = Mock(return_value=Mock(returncode=0))
             with patch.object(MODULE.shutil, "which", which_mock):
                 with patch.object(MODULE.subprocess, "run", run_mock):
                     report = MODULE.validate(project, run_commands=True)
-            self.assertTrue(any("missing script: typecheck" in item for item in report.errors))
-            which_mock.assert_called_once_with("pnpm")
-            self.assertEqual(["pnpm test"], _executed_commands(run_mock))
+            self.assertTrue(any("missing script: build" in item for item in report.errors))
+            which_mock.assert_called_once_with("yarn")
+            self.assertEqual([], _executed_commands(run_mock))
 
     def test_run_commands_records_non_zero_failure(self) -> None:
         with TemporaryDirectory() as temp:
             project = Path(temp)
             _write_contract_compliant_project(project)
-            scripts = json.loads((project / "package.json").read_text(encoding="utf-8"))["scripts"]
-            scripts["typecheck"] = "exit 7"
-            (project / "package.json").write_text(json.dumps({"scripts": scripts}), encoding="utf-8")
 
             def fake_run(command, cwd, check, env=None, timeout=None):  # type: ignore[no-untyped-def]
-                return Mock(returncode=7 if command[-1] == "typecheck" else 0)
+                return Mock(returncode=7 if command[-1] == "build" else 0)
 
-            which_mock = Mock(return_value="/usr/bin/pnpm")
+            which_mock = Mock(return_value="/usr/bin/yarn")
             with patch.object(MODULE.shutil, "which", which_mock):
                 with patch.object(MODULE.subprocess, "run", side_effect=fake_run) as run_mock:
                     report = MODULE.validate(project, run_commands=True)
-            self.assertTrue(any("command failed (7): pnpm typecheck" in item for item in report.errors))
-            which_mock.assert_called_once_with("pnpm")
-            self.assertEqual(
-                ["pnpm typecheck", "pnpm test", "pnpm build"],
-                _executed_commands(run_mock),
-            )
+            self.assertTrue(any("command failed (7): yarn build" in item for item in report.errors))
+            which_mock.assert_called_once_with("yarn")
+            self.assertEqual(["yarn build"], _executed_commands(run_mock))
 
     def test_command_exception_not_found_records_127(self) -> None:
         with TemporaryDirectory() as temp:
@@ -1012,19 +631,16 @@ export function HomePage({ service }) {
             _write_contract_compliant_project(project)
 
             def raise_not_found(*args, **kwargs):  # type: ignore[no-untyped-def]
-                raise FileNotFoundError("pnpm")
+                raise FileNotFoundError("yarn")
 
-            which_mock = Mock(return_value="/usr/bin/pnpm")
+            which_mock = Mock(return_value="/usr/bin/yarn")
             with patch.object(MODULE.shutil, "which", which_mock):
                 with patch.object(MODULE.subprocess, "run", side_effect=raise_not_found) as run_mock:
                     report = MODULE.validate(project, run_commands=True)
-            self.assertEqual(127, report.commands.get("pnpm typecheck"))
-            self.assertTrue(any("command not found: pnpm typecheck" in item for item in report.errors))
-            which_mock.assert_called_once_with("pnpm")
-            self.assertEqual(
-                ["pnpm typecheck", "pnpm test", "pnpm build"],
-                _executed_commands(run_mock),
-            )
+            self.assertEqual(127, report.commands.get("yarn build"))
+            self.assertTrue(any("command not found: yarn build" in item for item in report.errors))
+            which_mock.assert_called_once_with("yarn")
+            self.assertEqual(["yarn build"], _executed_commands(run_mock))
 
     def test_command_exception_timeout_records_124(self) -> None:
         with TemporaryDirectory() as temp:
@@ -1032,130 +648,47 @@ export function HomePage({ service }) {
             _write_contract_compliant_project(project)
 
             def raise_timeout(*args, **kwargs):  # type: ignore[no-untyped-def]
-                raise TimeoutExpired(cmd="pnpm typecheck", timeout=1)
+                raise TimeoutExpired(cmd="yarn build", timeout=1)
 
-            which_mock = Mock(return_value="/usr/bin/pnpm")
+            which_mock = Mock(return_value="/usr/bin/yarn")
             with patch.object(MODULE.shutil, "which", which_mock):
                 with patch.object(MODULE.subprocess, "run", side_effect=raise_timeout) as run_mock:
                     report = MODULE.validate(project, run_commands=True, command_timeout=1)
-            self.assertEqual(124, report.commands.get("pnpm typecheck"))
+            self.assertEqual(124, report.commands.get("yarn build"))
             self.assertTrue(any("command timed out" in item for item in report.errors))
-            which_mock.assert_called_once_with("pnpm")
-            self.assertEqual(
-                ["pnpm typecheck", "pnpm test", "pnpm build"],
-                _executed_commands(run_mock),
-            )
+            which_mock.assert_called_once_with("yarn")
+            self.assertEqual(["yarn build"], _executed_commands(run_mock))
 
     def test_command_returned_127_reports_failed_not_not_found(self) -> None:
         with TemporaryDirectory() as temp:
             project = Path(temp)
             _write_contract_compliant_project(project)
-            which_mock = Mock(return_value="/usr/bin/pnpm")
+            which_mock = Mock(return_value="/usr/bin/yarn")
             with patch.object(MODULE.shutil, "which", which_mock):
                 with patch.object(MODULE.subprocess, "run", return_value=Mock(returncode=127)) as run_mock:
                     report = MODULE.validate(project, run_commands=True)
-            self.assertTrue(any("command failed (127): pnpm typecheck" in item for item in report.errors))
+            self.assertTrue(any("command failed (127): yarn build" in item for item in report.errors))
             self.assertFalse(any("command not found" in item for item in report.errors))
-            which_mock.assert_called_once_with("pnpm")
-            self.assertEqual(
-                ["pnpm typecheck", "pnpm test", "pnpm build"],
-                _executed_commands(run_mock),
-            )
+            which_mock.assert_called_once_with("yarn")
+            self.assertEqual(["yarn build"], _executed_commands(run_mock))
 
     def test_command_returned_124_reports_failed_not_timeout(self) -> None:
         with TemporaryDirectory() as temp:
             project = Path(temp)
             _write_contract_compliant_project(project)
-            which_mock = Mock(return_value="/usr/bin/pnpm")
+            which_mock = Mock(return_value="/usr/bin/yarn")
             with patch.object(MODULE.shutil, "which", which_mock):
                 with patch.object(MODULE.subprocess, "run", return_value=Mock(returncode=124)) as run_mock:
                     report = MODULE.validate(project, run_commands=True)
-            self.assertTrue(any("command failed (124): pnpm typecheck" in item for item in report.errors))
+            self.assertTrue(any("command failed (124): yarn build" in item for item in report.errors))
             self.assertFalse(any("command timed out" in item for item in report.errors))
-            which_mock.assert_called_once_with("pnpm")
-            self.assertEqual(
-                ["pnpm typecheck", "pnpm test", "pnpm build"],
-                _executed_commands(run_mock),
-            )
+            which_mock.assert_called_once_with("yarn")
+            self.assertEqual(["yarn build"], _executed_commands(run_mock))
 
     def test_malformed_ipv6_public_base_is_rejected(self) -> None:
         self.assertFalse(MODULE._is_valid_public_base("http://[::1"))
 
-    def test_run_commands_strips_vite_public_base_from_default_scripts(self) -> None:
-        with TemporaryDirectory() as temp:
-            project = Path(temp)
-            _write_contract_compliant_project(project)
-            captured: list[dict[str, str] | None] = []
-
-            def fake_run(command, cwd, check, env=None, timeout=None):  # type: ignore[no-untyped-def]
-                captured.append(env)
-                return Mock(returncode=0)
-
-            with patch.dict(os.environ, {"VITE_PUBLIC_BASE": "https://leak.example/"}, clear=False):
-                which_mock = Mock(return_value="/usr/bin/pnpm")
-                with patch.object(MODULE.shutil, "which", which_mock):
-                    with patch.object(MODULE.subprocess, "run", side_effect=fake_run) as run_mock:
-                        MODULE.validate(project, run_commands=True)
-            for env in captured[:3]:
-                assert env is not None
-                self.assertNotIn("VITE_PUBLIC_BASE", env)
-            which_mock.assert_called_once_with("pnpm")
-            self.assertEqual(
-                ["pnpm typecheck", "pnpm test", "pnpm build"],
-                _executed_commands(run_mock),
-            )
-
-    def test_build_qiankun_skipped_for_invalid_base(self) -> None:
-        with TemporaryDirectory() as temp:
-            project = Path(temp)
-            _write_contract_compliant_project(project)
-            scripts = json.loads((project / "package.json").read_text(encoding="utf-8"))["scripts"]
-            scripts["build:qiankun"] = "exit 0"
-            (project / "package.json").write_text(json.dumps({"scripts": scripts}), encoding="utf-8")
-            which_mock = Mock(return_value="/usr/bin/pnpm")
-            with patch.object(MODULE.shutil, "which", which_mock):
-                with patch.object(MODULE.subprocess, "run", return_value=Mock(returncode=0)) as run_mock:
-                    report = MODULE.validate(
-                        project,
-                        run_commands=True,
-                        vite_public_base="/relative/path",
-                    )
-            executed = _executed_commands(run_mock)
-            self.assertNotIn("pnpm build:qiankun", executed)
-            self.assertEqual(["pnpm typecheck", "pnpm test", "pnpm build"], executed)
-            which_mock.assert_called_once_with("pnpm")
-            self.assertTrue(any("skipped pnpm build:qiankun" in item for item in report.warnings))
-
-    def test_build_qiankun_runs_with_valid_vite_public_base(self) -> None:
-        with TemporaryDirectory() as temp:
-            project = Path(temp)
-            _write_contract_compliant_project(project)
-            scripts = json.loads((project / "package.json").read_text(encoding="utf-8"))["scripts"]
-            scripts["build:qiankun"] = "exit 0"
-            (project / "package.json").write_text(json.dumps({"scripts": scripts}), encoding="utf-8")
-            captured: dict[str, str] = {}
-
-            def fake_run(command, cwd, check, env=None, timeout=None):  # type: ignore[no-untyped-def]
-                if command[-1] == "build:qiankun" and env:
-                    captured.update(env)
-                return Mock(returncode=0)
-
-            which_mock = Mock(return_value="/usr/bin/pnpm")
-            with patch.object(MODULE.shutil, "which", which_mock):
-                with patch.object(MODULE.subprocess, "run", side_effect=fake_run) as run_mock:
-                    report = MODULE.validate(
-                        project,
-                        run_commands=True,
-                        vite_public_base="https://cdn.example.com/inventory/",
-                    )
-            self.assertEqual([], report.errors)
-            self.assertEqual("https://cdn.example.com/inventory/", captured.get("VITE_PUBLIC_BASE"))
-            which_mock.assert_called_once_with("pnpm")
-            self.assertEqual(
-                ["pnpm typecheck", "pnpm test", "pnpm build", "pnpm build:qiankun"],
-                _executed_commands(run_mock),
-            )
-
 
 if __name__ == "__main__":
     unittest.main()
+

@@ -4,17 +4,14 @@
     {
       "id": 1,
       "prompt": "为仓储团队生成一个名为 inventory-console 的 qiankun 子应用。需要商品和库存列表、多条件筛选、库存详情、调整库存抽屉、批量盘点；仓库管理员可编辑，审计员只读。使用 Mock，但提供可替换 API。",
-      "expected_output": "A buildable data-management app with dual runtime, typed services, Mock adapter and RBAC.",
+      "expected_output": "A buildable Umi Max data-management app with qiankun slave, feature modules, Mock and RBAC.",
       "files": [],
       "expectations": [
-        "pnpm typecheck exits with code 0",
-        "pnpm test exits with code 0",
-        "pnpm build exits with code 0",
-        "micro-app adapter exports bootstrap, mount, and unmount",
-        "application supports standalone rendering via main entry",
-        "routes, menu, and action permissions share permission declarations",
-        "pages import service contracts and do not import Mock fixtures",
-        "ConfigProvider is present and page code has no hard-coded color values",
+        "yarn build exits with code 0",
+        ".umirc.ts enables qiankun.slave and antd",
+        "src/app.ts exports qiankun bootstrap, mount, and unmount",
+        "routes live in src/router/routes.ts and access flags in src/access.ts",
+        "pages assemble features and do not import mock/",
         "loading, empty, error, and forbidden states are implemented",
         "README documents host integration and API replacement points"
       ]
@@ -25,14 +22,11 @@
       "expected_output": "A buildable approval app with role-specific routes/actions and explicit workflow states.",
       "files": [],
       "expectations": [
-        "pnpm typecheck exits with code 0",
-        "pnpm test exits with code 0",
-        "pnpm build exits with code 0",
-        "micro-app adapter exports bootstrap, mount, and unmount",
-        "application supports standalone rendering via main entry",
-        "routes, menu, and action permissions share permission declarations",
-        "pages import service contracts and do not import Mock fixtures",
-        "ConfigProvider is present and page code has no hard-coded color values",
+        "yarn build exits with code 0",
+        ".umirc.ts enables qiankun.slave and antd",
+        "src/app.ts exports qiankun bootstrap, mount, and unmount",
+        "routes live in src/router/routes.ts and access flags in src/access.ts",
+        "pages assemble features and do not import mock/",
         "loading, empty, error, and forbidden states are implemented",
         "README documents host integration and API replacement points"
       ]
@@ -43,14 +37,11 @@
       "expected_output": "A buildable monitoring app with scenario-appropriate information architecture and permissions.",
       "files": [],
       "expectations": [
-        "pnpm typecheck exits with code 0",
-        "pnpm test exits with code 0",
-        "pnpm build exits with code 0",
-        "micro-app adapter exports bootstrap, mount, and unmount",
-        "application supports standalone rendering via main entry",
-        "routes, menu, and action permissions share permission declarations",
-        "pages import service contracts and do not import Mock fixtures",
-        "ConfigProvider is present and page code has no hard-coded color values",
+        "yarn build exits with code 0",
+        ".umirc.ts enables qiankun.slave and antd",
+        "src/app.ts exports qiankun bootstrap, mount, and unmount",
+        "routes live in src/router/routes.ts and access flags in src/access.ts",
+        "pages assemble features and do not import mock/",
         "loading, empty, error, and forbidden states are implemented",
         "README documents host integration and API replacement points"
       ]

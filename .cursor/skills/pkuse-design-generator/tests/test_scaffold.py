@@ -18,95 +18,64 @@ class ScaffoldTest(unittest.TestCase):
             output = Path(temp) / "inventory-console"
             MODULE.scaffold("inventory-console", "库存中心", "data-management", output)
             package = (output / "package.json").read_text(encoding="utf-8")
-            main = (output / "src/main.tsx").read_text(encoding="utf-8")
+            app = (output / "src/app.ts").read_text(encoding="utf-8")
+            umirc = (output / ".umirc.ts").read_text(encoding="utf-8")
             manifest = (output / "src/generated/scene.json").read_text(encoding="utf-8")
             self.assertIn('"name": "inventory-console"', package)
-            self.assertIn("库存中心", main)
+            self.assertIn("库存中心", app)
+            self.assertIn("库存中心", umirc)
             self.assertIn('"scene": "data-management"', manifest)
-            self.assertNotIn("__APP_", package + main)
+            self.assertNotIn("__APP_", package + app + umirc)
 
-    def test_generated_runtime_has_dual_mode_and_cleanup(self) -> None:
+    def test_generated_runtime_has_umi_qiankun_slave(self) -> None:
         with TemporaryDirectory() as temp:
             output = Path(temp) / "ops-console"
             MODULE.scaffold("ops-console", "运维中心", "monitoring", output)
-            adapter = (output / "src/micro-app/adapter.tsx").read_text(
-                encoding="utf-8"
-            )
-            main = (output / "src/main.tsx").read_text(encoding="utf-8")
-            html = (output / "index.html").read_text(encoding="utf-8")
+            app = (output / "src/app.ts").read_text(encoding="utf-8")
+            umirc = (output / ".umirc.ts").read_text(encoding="utf-8")
             package = (output / "package.json").read_text(encoding="utf-8")
-            vite = (output / "vite.config.ts").read_text(encoding="utf-8")
 
-            self.assertIn("export async function bootstrap", adapter)
-            self.assertIn("export async function mount", adapter)
-            self.assertIn("export async function unmount", adapter)
-            self.assertIn("export async function update", adapter)
-            self.assertIn("mountedRoot?.unmount()", adapter)
-            self.assertIn("props?.offGlobalStateChange?.()", adapter)
-            self.assertIn("callSafely(abortAllRequests)", adapter)
-            self.assertIn("callSafely(clearAllResources)", adapter)
-            self.assertIn("props.container", adapter)
-            self.assertIn("disposeCurrent()", adapter)
-            self.assertIn("nextRoot = createRoot(mountElement)", adapter)
-            self.assertIn("renderWithQiankun", main)
-            self.assertIn("data-pkuse-root='ops-console'", adapter)
-            self.assertIn('data-pkuse-root="ops-console"', html)
-            self.assertIn('"antd": "^6', package)
-            self.assertIn('"qiankun": "^2', package)
-            self.assertIn('mode === "qiankun"', vite)
-            self.assertIn("requires VITE_PUBLIC_BASE", vite)
-            self.assertIn("VITE_PUBLIC_BASE", vite)
-            self.assertIn('"build:qiankun"', package)
-            self.assertIn("verify-build-base.mjs", package)
-            self.assertTrue((output / ".env.qiankun.example").is_file())
-            self.assertTrue(
-                (output / "src/micro-app/adapter.test.tsx").is_file()
-            )
+            self.assertIn("export const qiankun", app)
+            self.assertIn("async bootstrap", app)
+            self.assertIn("async mount", app)
+            self.assertIn("async unmount", app)
+            self.assertIn("menuRender: false", app)
+            self.assertIn("menuHeaderRender: false", app)
+            self.assertIn("qiankun:", umirc)
+            self.assertIn("slave:", umirc)
+            self.assertIn("antd:", umirc)
+            self.assertIn('"@umijs/max"', package)
+            self.assertIn('"antd": "^6.6.1"', package)
+            self.assertIn('"@ant-design/icons": "^6.3.2"', package)
+            self.assertTrue((output / "src/pages/DesignSystem/index.tsx").is_file())
+            self.assertFalse((output / "vite.config.ts").exists())
+            self.assertFalse((output / "src/micro-app").exists())
 
-    def test_generated_app_has_provider_rbac_and_service_boundaries(self) -> None:
+    def test_generated_app_has_feature_access_and_routes(self) -> None:
         with TemporaryDirectory() as temp:
             output = Path(temp) / "access-console"
             MODULE.scaffold("access-console", "权限中心", "system-config", output)
-            app = (output / "src/app/App.tsx").read_text(encoding="utf-8")
-            access = (output / "src/auth/access.ts").read_text(encoding="utf-8")
-            services = (output / "src/app/services.ts").read_text(encoding="utf-8")
-            page = (output / "src/features/home/HomePage.tsx").read_text(
+            access = (output / "src/access.ts").read_text(encoding="utf-8")
+            routes = (output / "src/router/routes.ts").read_text(encoding="utf-8")
+            request = (output / "src/utils/request.ts").read_text(encoding="utf-8")
+            page = (output / "src/pages/User/UserList/index.tsx").read_text(
                 encoding="utf-8"
             )
-            manifest = (output / "src/routes/manifest.tsx").read_text(
-                encoding="utf-8"
-            )
-            errors = (output / "src/services/errors.ts").read_text(
-                encoding="utf-8"
-            )
+            modal = (
+                output / "src/features/user/components/UserListWithModal/index.tsx"
+            ).read_text(encoding="utf-8")
 
-            self.assertIn("ConfigProvider", app)
-            self.assertIn('prefixCls="access-console"', app)
-            self.assertIn('key: "access_console"', app)
-            self.assertIn("ErrorBoundary", app)
-            self.assertIn("createRouteManifest", app)
-            self.assertIn("buildVisibleMenu", app)
-            self.assertIn("canAccessRoute", app)
-            self.assertNotIn('from "../features/home/HomePage"', app)
-            self.assertIn("export function can(", access)
-            self.assertIn("createServices", services)
-            self.assertIn("MockEntityService", services)
-            self.assertIn("ApiEntityService", services)
+            self.assertIn("canViewUser", access)
+            self.assertIn("canEditUser", access)
+            self.assertIn("access: 'canViewUser'", routes)
+            self.assertIn("component: './DesignSystem'", routes)
+            self.assertIn("BizError", request)
+            self.assertNotIn("/mock/", page)
             self.assertNotIn("/mocks/", page)
-            self.assertIn("createRouteManifest", manifest)
-            self.assertIn("PERMISSIONS.HOME_VIEW", manifest)
-            self.assertIn("buildVisibleMenu", manifest)
-            self.assertIn("UnauthorizedError", errors)
-            self.assertIn("ForbiddenError", errors)
-            self.assertIn("NotFoundError", errors)
-            self.assertIn("ServerError", errors)
-            self.assertIn("NetworkError", errors)
-            self.assertIn("BusinessError", errors)
-            self.assertIn("ProtocolError", errors)
-            self.assertTrue((output / "src/routes/manifest.test.tsx").is_file())
-            self.assertTrue((output / "src/services/api.test.ts").is_file())
-            for state in ("loading", "empty", "error", "forbidden"):
-                self.assertIn(state, page)
+            self.assertIn("useUserList", page)
+            self.assertIn("<Access", modal)
+            self.assertTrue((output / "mock/user.ts").is_file())
+            self.assertTrue((output / "src/features/user/services/index.ts").is_file())
 
     def test_rejects_invalid_name_and_existing_output(self) -> None:
         with TemporaryDirectory() as temp:

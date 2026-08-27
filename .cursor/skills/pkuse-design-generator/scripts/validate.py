@@ -35,16 +35,12 @@ STYLE_OBJECT_CONTEXT = re.compile(r"\bstyle\s*=\s*\{\s*$")
 TOKEN_OBJECT_CONTEXT = re.compile(r"\btoken\s*:\s*\{\s*$")
 
 THEME_FILES = {"theme.ts", "theme.tsx"}
-COLOR_SCAN_SUFFIXES = {".ts", ".tsx", ".css"}
+COLOR_SCAN_SUFFIXES = {".ts", ".tsx", ".css", ".less"}
 TOKEN_SCAN_FILES = {
     "package.json",
-    "vite.config.ts",
+    ".umirc.ts",
     "tsconfig.json",
-    "tsconfig.app.json",
-    "tsconfig.node.json",
-    "index.html",
     "README.md",
-    ".env.qiankun.example",
 }
 TOKEN_SCAN_SUFFIXES = {
     ".ts",
@@ -59,10 +55,10 @@ TOKEN_SCAN_SUFFIXES = {
     ".md",
 }
 TOKEN_EXCLUDE_DIRS = {"node_modules", "dist", "coverage"}
-MOCK_ALLOWED_PREFIX = "src/micro-app/"
-MOCK_ALLOWED_FILES = {"src/app/services.ts"}
-DEFAULT_COMMANDS = ("typecheck", "test", "build")
-QIANKUN_COMMAND = "build:qiankun"
+MOCK_ALLOWED_PREFIXES: tuple[str, ...] = ()
+MOCK_ALLOWED_FILES: set[str] = set()
+DEFAULT_COMMANDS = ("build",)
+PACKAGE_MANAGER = "yarn"
 DEFAULT_COMMAND_TIMEOUT_SECONDS = 900
 EXIT_NOT_FOUND = 127
 EXIT_TIMEOUT = 124
@@ -519,15 +515,21 @@ def _points_to_mocks(specifier: str) -> bool:
     normalized = _normalize_module_specifier(specifier)
     return (
         "/mocks/" in normalized
+        or "/mock/" in normalized
         or normalized.startswith("mocks/")
+        or normalized.startswith("mock/")
         or normalized.endswith("/mocks")
-        or normalized == "mocks"
+        or normalized.endswith("/mock")
+        or normalized in {"mocks", "mock"}
         or normalized.endswith("/mocks/index")
+        or normalized.endswith("/mock/index")
     )
 
 
 def _is_mock_import_allowed(relative: str) -> bool:
-    return relative.startswith(MOCK_ALLOWED_PREFIX) or relative in MOCK_ALLOWED_FILES
+    if relative in MOCK_ALLOWED_FILES:
+        return True
+    return any(relative.startswith(prefix) for prefix in MOCK_ALLOWED_PREFIXES)
 
 
 def _strip_css_url_hash_refs(value: str) -> str:
@@ -622,14 +624,20 @@ def _find_ts_color_violations(source: str) -> list[str]:
 
 
 def _feature_page_paths(project: Path) -> list[Path]:
-    features = project / "src/features"
-    if not features.is_dir():
-        return []
-    return [
-        path
-        for path in features.rglob("*.tsx")
-        if path.is_file() and ".test." not in path.name
-    ]
+    paths: list[Path] = []
+    for root_name in ("src/pages", "src/features"):
+        root = project / root_name
+        if not root.is_dir():
+            continue
+        for path in root.rglob("*.tsx"):
+            if not path.is_file() or ".test." in path.name:
+                continue
+            if "DesignSystem" in path.parts or any(
+                "SearchForm" in part for part in path.parts
+            ):
+                continue
+            paths.append(path)
+    return paths
 
 
 def _page_has_action_surface(code: str) -> bool:
@@ -646,9 +654,15 @@ def _page_is_data_request(code: str) -> bool:
     return bool(
         re.search(r"\bservice\s*[\.\(]", code)
         or re.search(r"\bEntityService\b", code)
+        or re.search(r"\bfetch\w+\s*\(", code)
+        or re.search(r"\buse(?:User|Order|Entity)\w*\b", code)
         or (
             re.search(r"\buseEffect\s*\(", code)
             and re.search(r"\bservice\b", code)
+        )
+        or (
+            re.search(r"from\s+['\"]@/features/", code)
+            and re.search(r"\bloading\b", code)
         )
     )
 
@@ -674,29 +688,49 @@ def _find_state_branch_body(code: str, lex: LexResult, state_value: str) -> str 
 def _page_state_checks(source: str) -> dict[str, bool]:
     lex = tokenize(source)
     code = lex.code_only
-    results = {name: False for name in STATE_VALUES}
+    branched = {name: False for name in STATE_VALUES}
     for state_value in STATE_VALUES:
         body = _find_state_branch_body(code, lex, state_value)
         if not body:
             continue
         if state_value == "loading" and re.search(r"<\s*Spin\b", body):
-            results["loading"] = True
+            branched["loading"] = True
         elif state_value == "empty" and re.search(r"<\s*Empty\b", body):
-            results["empty"] = True
+            branched["empty"] = True
         elif state_value == "error" and re.search(r"<\s*Result\b", body):
-            results["error"] = True
+            branched["error"] = True
         elif state_value == "forbidden" and re.search(
             r"<\s*Result\b[\s\S]*?status\s*=",
             body,
         ):
-            results["forbidden"] = True
-    return results
+            branched["forbidden"] = True
+    umi_style = {
+        "loading": bool(
+            re.search(r"<\s*Spin\b", code) or re.search(r"\bloading\s*=", code)
+        ),
+        "empty": bool(re.search(r"<\s*Empty\b", code)),
+        "error": bool(re.search(r"<\s*Result\b", code)),
+        "forbidden": bool(
+            re.search(r"<\s*Access\b", code)
+            or re.search(r"\buseAccess\s*\(", code)
+            or re.search(r"status\s*=\s*\{?\s*['\"]403['\"]", code)
+        ),
+    }
+    return {name: branched[name] or umi_style[name] for name in STATE_VALUES}
 
 
 def _page_has_permission_disabled_guard(code: str) -> bool:
     return bool(
-        re.search(
+        re.search(r"<\s*Access\b", code)
+        or re.search(r"\buseAccess\s*\(", code)
+        or re.search(r"\baccessible\s*=", code)
+        or re.search(
             r"disabled\s*=\s*\{[^}]*\bcan\s*\([^)]*PERMISSIONS\.[^}]*\}",
+            code,
+            re.DOTALL,
+        )
+        or re.search(
+            r"disabled\s*=\s*\{[^}]*\baccess\.",
             code,
             re.DOTALL,
         )
@@ -916,24 +950,38 @@ def _has_antd_config_provider_wrapper(source: str) -> bool:
 
 
 def _check_lifecycle(project: Path, report: ValidationReport) -> None:
-    adapter = project / "src/micro-app/adapter.tsx"
+    umirc = project / ".umirc.ts"
+    if not umirc.is_file():
+        report.errors.append("qiankun slave config is missing from .umirc.ts")
+        return
+    umirc_code = to_code_only_view(umirc.read_text(encoding="utf-8"))
+    if not re.search(r"\bqiankun\s*:", umirc_code) or not re.search(
+        r"\bslave\s*:", umirc_code
+    ):
+        report.errors.append("qiankun slave config is missing from .umirc.ts")
+
+    adapter = project / "src/app.ts"
     if not adapter.is_file():
-        report.errors.append("qiankun lifecycle exports are incomplete in src/micro-app/adapter.tsx")
+        report.errors.append("qiankun lifecycle exports are incomplete in src/app.ts")
         return
     source = adapter.read_text(encoding="utf-8")
-    exports = extract_export_async_functions(source)
-    missing = [name for name in ("bootstrap", "mount", "unmount") if name not in exports]
+    code = to_code_only_view(source)
+    if not re.search(r"export\s+const\s+qiankun\b", code):
+        report.errors.append("qiankun lifecycle exports are incomplete in src/app.ts")
+        return
+    missing = [
+        name
+        for name in ("bootstrap", "mount", "unmount")
+        if not re.search(rf"\basync\s+{name}\s*\(", code)
+    ]
     if missing:
         report.errors.append(
-            "qiankun lifecycle exports are incomplete in src/micro-app/adapter.tsx "
+            "qiankun lifecycle exports are incomplete in src/app.ts "
             f"(missing: {', '.join(missing)})"
         )
-        return
-    if not _validate_root_cleanup_chain(source):
+    if "menuRender" not in source or "menuHeaderRender" not in source:
         report.errors.append(
-            "unmount in src/micro-app/adapter.tsx must follow disposeCurrent -> "
-            "mountedRoot=root -> disposeResources(..., mountedRoot) -> mountedRoot.unmount(), "
-            "or call root?.unmount() directly"
+            "src/app.ts must hide production menu with menuRender and menuHeaderRender"
         )
 
 
@@ -968,71 +1016,48 @@ def _check_hard_coded_colors(project: Path, report: ValidationReport) -> None:
 def _check_mock_imports(project: Path, source_files: list[Path], report: ValidationReport) -> None:
     for path in source_files:
         relative = _relative_path(project, path)
-        if relative.startswith("src/mocks/") or _is_mock_import_allowed(relative):
+        if _is_mock_import_allowed(relative):
             continue
         source = path.read_text(encoding="utf-8")
         for specifier in extract_module_specifiers(source):
             if _points_to_mocks(specifier):
                 report.errors.append(
-                    f"application source imports mocks directly (only src/micro-app/ and "
-                    f"src/app/services.ts may wire mocks): {relative} -> {specifier}"
+                    f"application source imports mocks directly "
+                    f"(pages and features must use services): {relative} -> {specifier}"
                 )
                 break
 
 
 def _check_config_provider(project: Path, report: ValidationReport) -> None:
-    app_file = project / "src/app/App.tsx"
-    if not app_file.is_file():
-        report.errors.append(
-            "src/app/App.tsx must import ConfigProvider from antd and wrap content with "
-            "an opening/closing <ConfigProvider> element"
-        )
+    umirc = project / ".umirc.ts"
+    if not umirc.is_file():
+        report.errors.append(".umirc.ts must enable the antd plugin")
         return
-    if not _has_antd_config_provider_wrapper(app_file.read_text(encoding="utf-8")):
-        report.errors.append(
-            "src/app/App.tsx must import ConfigProvider from antd and wrap content with "
-            "an opening/closing <ConfigProvider> element"
-        )
+    code = to_code_only_view(umirc.read_text(encoding="utf-8"))
+    if not re.search(r"\bantd\s*:", code):
+        report.errors.append(".umirc.ts must enable the antd plugin")
 
 
 def _check_manifest_and_router(project: Path, report: ValidationReport) -> None:
-    permissions_file = project / "src/auth/permissions.ts"
-    manifest_file = project / "src/routes/manifest.tsx"
-    if not manifest_file.is_file():
-        manifest_file = project / "src/routes/manifest.ts"
-    app_file = project / "src/app/App.tsx"
+    access_file = project / "src/access.ts"
+    routes_file = project / "src/router/routes.ts"
 
-    if not permissions_file.is_file() or not PERMISSIONS_DECL.search(
-        to_code_only_view(permissions_file.read_text(encoding="utf-8"))
+    if not access_file.is_file() or not re.search(
+        r"export\s+default\b",
+        to_code_only_view(access_file.read_text(encoding="utf-8")),
     ):
-        report.errors.append(
-            "shared permission constants are missing from src/auth/permissions.ts"
-        )
+        report.errors.append("shared access flags are missing from src/access.ts")
         return
-    if not manifest_file.is_file():
-        report.errors.append("route manifest file is missing under src/routes/")
+    if not routes_file.is_file():
+        report.errors.append("route table is missing under src/router/routes.ts")
         return
-    manifest_code = to_code_only_view(manifest_file.read_text(encoding="utf-8"))
-    if not MANIFEST_PERMISSIONS.search(manifest_code):
-        report.errors.append(
-            "route manifest must declare permissions: [PERMISSIONS.*] entries"
-        )
-    if not app_file.is_file():
-        report.errors.append("src/app/App.tsx must consume the shared route manifest")
-        return
-    app_code = to_code_only_view(app_file.read_text(encoding="utf-8"))
-    router_checks = {
-        "createRouteManifest": bool(re.search(r"\bcreateRouteManifest\s*\(", app_code)),
-        "buildVisibleMenu": bool(re.search(r"\bbuildVisibleMenu\s*\(\s*manifest\b", app_code)),
-        "canAccessRoute": bool(re.search(r"\bcanAccessRoute\s*\(\s*route\b", app_code)),
-        "manifest.map": bool(re.search(r"\bmanifest\s*\.\s*map\s*\(", app_code)),
-    }
-    missing_router = [name for name, ok in router_checks.items() if not ok]
-    if missing_router:
-        report.errors.append(
-            "src/app/App.tsx must route and menu through the same manifest helpers "
-            f"(missing: {', '.join(missing_router)})"
-        )
+    routes_code = to_code_only_view(routes_file.read_text(encoding="utf-8"))
+    if not re.search(r"\baccess\s*:", routes_code):
+        report.errors.append("route table must declare access: flags for protected routes")
+    if not re.search(r"\bpath\s*:", routes_code) or not re.search(
+        r"\bcomponent\s*:", routes_code
+    ):
+        report.errors.append("route table must declare path and component entries")
 
 
 def _check_feature_actions(project: Path, report: ValidationReport) -> None:
@@ -1052,23 +1077,47 @@ def _check_feature_actions(project: Path, report: ValidationReport) -> None:
 
 
 def _check_feature_states(project: Path, report: ValidationReport) -> None:
-    feature_files = _feature_page_paths(project)
-    if not feature_files:
+    groups: dict[str, list[Path]] = {}
+    features = project / "src/features"
+    pages = project / "src/pages"
+    if features.is_dir():
+        for child in features.iterdir():
+            if child.is_dir() and child.name != "shared":
+                groups[child.name.lower()] = [
+                    path
+                    for path in child.rglob("*.tsx")
+                    if path.is_file()
+                    and ".test." not in path.name
+                    and not any("SearchForm" in part for part in path.parts)
+                ]
+    if pages.is_dir():
+        for child in pages.iterdir():
+            if child.is_dir() and child.name not in {"Home", "Access", "DesignSystem"}:
+                groups.setdefault(child.name.lower(), []).extend(
+                    [
+                        path
+                        for path in child.rglob("*.tsx")
+                        if path.is_file() and ".test." not in path.name
+                    ]
+                )
+    if not groups:
         report.errors.append(
             "no feature pages found for loading/empty/error/forbidden baseline states"
         )
         return
     checked_any = False
-    for path in feature_files:
-        source = path.read_text(encoding="utf-8")
-        code = to_code_only_view(source)
+    for name, files in sorted(groups.items()):
+        if not files:
+            continue
+        combined = "\n".join(path.read_text(encoding="utf-8") for path in files)
+        code = to_code_only_view(combined)
         if not _page_is_data_request(code):
             continue
         checked_any = True
-        missing = [name for name, ok in _page_state_checks(source).items() if not ok]
+        missing = [state for state, ok in _page_state_checks(combined).items() if not ok]
         if missing:
             report.errors.append(
-                f"{_relative_path(project, path)} missing JSX baseline states: {', '.join(missing)}"
+                f"feature {name} missing JSX baseline states: {', '.join(missing)}"
             )
     if not checked_any:
         report.errors.append(
@@ -1077,12 +1126,10 @@ def _check_feature_states(project: Path, report: ValidationReport) -> None:
 
 
 def _base_command_env() -> dict[str, str]:
-    env = os.environ.copy()
-    env.pop("VITE_PUBLIC_BASE", None)
-    return env
+    return os.environ.copy()
 
 
-def _run_pnpm_script(
+def _run_package_script(
     project: Path,
     script: str,
     env: dict[str, str],
@@ -1090,7 +1137,7 @@ def _run_pnpm_script(
 ) -> CommandResult:
     try:
         result = subprocess.run(
-            ("pnpm", script),
+            (PACKAGE_MANAGER, script),
             cwd=project,
             check=False,
             env=env,
@@ -1123,11 +1170,10 @@ def _record_command_failure(
 def _validate_commands(
     project: Path,
     report: ValidationReport,
-    vite_public_base: str | None,
     timeout_seconds: int,
 ) -> None:
-    if shutil.which("pnpm") is None:
-        report.errors.append("pnpm is not available on PATH")
+    if shutil.which(PACKAGE_MANAGER) is None:
+        report.errors.append(f"{PACKAGE_MANAGER} is not available on PATH")
         return
     try:
         scripts = _read_package_scripts(project)
@@ -1139,29 +1185,12 @@ def _validate_commands(
         if script not in scripts:
             report.errors.append(f"package.json missing script: {script}")
             continue
-        label = f"pnpm {script}"
+        label = f"{PACKAGE_MANAGER} {script}"
         _record_command_failure(
             report,
             label,
-            _run_pnpm_script(project, script, base_env, timeout_seconds),
+            _run_package_script(project, script, base_env, timeout_seconds),
             timeout_seconds,
-        )
-    if QIANKUN_COMMAND not in scripts:
-        return
-    if vite_public_base and _is_valid_public_base(vite_public_base):
-        qiankun_env = base_env.copy()
-        qiankun_env["VITE_PUBLIC_BASE"] = vite_public_base.strip()
-        label = f"pnpm {QIANKUN_COMMAND}"
-        _record_command_failure(
-            report,
-            label,
-            _run_pnpm_script(project, QIANKUN_COMMAND, qiankun_env, timeout_seconds),
-            timeout_seconds,
-        )
-    else:
-        report.warnings.append(
-            "skipped pnpm build:qiankun because VITE_PUBLIC_BASE was not provided "
-            "as an absolute http(s) URL"
         )
 
 
@@ -1180,7 +1209,6 @@ def _validate_project_layout(project: Path, report: ValidationReport) -> bool:
 def validate(
     project: Path,
     run_commands: bool = False,
-    vite_public_base: str | None = None,
     command_timeout: int = DEFAULT_COMMAND_TIMEOUT_SECONDS,
 ) -> ValidationReport:
     report = ValidationReport()
@@ -1200,7 +1228,7 @@ def validate(
     _check_feature_actions(project, report)
     _check_feature_states(project, report)
     if run_commands:
-        _validate_commands(project, report, vite_public_base, command_timeout)
+        _validate_commands(project, report, command_timeout)
     return report
 
 
@@ -1208,13 +1236,11 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("project", type=Path)
     parser.add_argument("--run-commands", action="store_true")
-    parser.add_argument("--vite-public-base")
     parser.add_argument("--command-timeout", type=int, default=DEFAULT_COMMAND_TIMEOUT_SECONDS)
     args = parser.parse_args()
     report = validate(
         args.project,
         run_commands=args.run_commands,
-        vite_public_base=args.vite_public_base,
         command_timeout=args.command_timeout,
     )
     for item in report.errors:

@@ -1,215 +1,116 @@
 # qiankun 微应用契约
 
-生成的子应用必须暴露兼容 qiankun 的生命周期，并通过 `src/micro-app/` 中的类型化适配器消费主应用 props。业务代码不得直接导入 qiankun API。
+生成的子应用是 **Umi Max qiankun slave**。生命周期由 Umi 导出；业务代码不得直接导入 qiankun API，也不得在 pages / features 里读取 `__POWERED_BY_QIANKUN__`。
+
+## 文件布局
+
+```text
+.umirc.ts          qiankun.slave、hash、antd、access、routes
+src/app.ts         getInitialState、layout、qiankun 钩子（bootstrap/mount/unmount/update）
+src/access.ts      由 InitialState.user.permissions 派生权限开关
+src/router/routes.ts
+```
+
+不要再创建 `src/micro-app/`。
 
 ## TypeScript 接口
 
-放在 `src/micro-app/contracts.ts`，作为主应用 ↔ 子应用通信的唯一事实来源。
+主应用传入的身份放在 `App.UserIdentity`（`src/types/app.d.ts`），由 `src/app.ts` 写入 `getInitialState`：
 
 ```ts
-export interface UserIdentity {
+interface UserIdentity {
   id: string;
   displayName: string;
   roles: string[];
   permissions: string[];
 }
 
-export interface GlobalStateActions {
-  onGlobalStateChange?: (
-    listener: (state: Record<string, unknown>, previous: Record<string, unknown>) => void,
-    fireImmediately?: boolean,
-  ) => void;
-  setGlobalState?: (state: Record<string, unknown>) => boolean;
-  offGlobalStateChange?: () => boolean;
-}
-
-export interface MicroAppProps extends GlobalStateActions {
-  container?: Element | ShadowRoot;
-  routeBase?: string;
+type QiankunProps = {
+  container?: Element;
   user?: UserIdentity;
   authToken?: string;
-  navigate?: (path: string) => void;
-}
+};
 ```
 
 ## 运行模式
 
-| 模式 | 入口 | 容器 | 路由基路径 | 认证来源 |
+| 模式 | 入口 | 容器 | 路由 | 认证来源 |
 | --- | --- | --- | --- | --- |
-| 独立运行 | `src/main.tsx` | `index.html` 中的 `#root` | `/` | 来自 `src/mocks/` 的本地 Mock 用户 |
-| 嵌入（qiankun） | `src/micro-app/lifecycle.ts` | 在 `props.container` 内查找 | `props.routeBase ?? '/'` | `props.user`、`props.authToken` |
+| 独立运行 | `yarn dev` / `max dev` | Umi 默认根节点 | Hash，基路径 `/` | `getInitialState` 本地标题；无 `user` 时 `access.ts` 视为管理端 |
+| 嵌入（qiankun） | Umi slave 生命周期 | 主应用 `props.container` | 同样 Hash；主应用负责外层导航 | `src/app.ts` 的 `qiankun.mount` 写入 `user`、`authToken` |
 
-只在适配器中判断模式：
-
-```ts
-export function isQiankunRuntime(): boolean {
-  return Boolean((window as Window & { __POWERED_BY_QIANKUN__?: boolean }).__POWERED_BY_QIANKUN__);
-}
-```
-
-## 容器查找
-
-始终在注入的容器内解析挂载节点；嵌入模式下不要假定存在全局 `#root`。
+`.umirc.ts` 必须开启：
 
 ```ts
-const MOUNT_SELECTOR = '[data-micro-app-root]';
-
-export function resolveMountNode(container?: Element | ShadowRoot): HTMLElement {
-  const scope = container ?? document;
-  const node = scope.querySelector<HTMLElement>(MOUNT_SELECTOR);
-  if (!node) {
-    throw new Error(`Mount node "${MOUNT_SELECTOR}" not found inside container`);
-  }
-  return node;
-}
+qiankun: {
+  slave: {},
+},
+hash: true,
 ```
 
-生成的应用壳必须渲染 `<div data-micro-app-root />` 作为 React 挂载点。
+## 生命周期
 
-## 生命周期导出
-
-从 `src/micro-app/lifecycle.ts` 导出（`isQiankunRuntime()` 为真时由 Vite 入口再导出）：
+在 `src/app.ts` 导出 `qiankun` 钩子（Umi 会再导出给主应用）：
 
 | 钩子 | 是否必须 | 职责 |
 | --- | --- | --- |
-| `bootstrap` | 是 | 一次性异步初始化：校验环境、预加载共享配置。不写 DOM。 |
-| `mount` | 是 | 创建全新的 React Root 与 Router，把 props 接入 Provider，渲染到作用域容器。 |
-| `unmount` | 是 | 完整清理（见下文）。 |
-| `update` | 可选 | 主应用传入新的用户、token 或路由基路径时，在不重新挂载的情况下应用变更后的 `MicroAppProps`。 |
-
-### bootstrap
+| `bootstrap` | 是 | 幂等准备，不写业务 DOM |
+| `mount` | 是 | 保存主应用 `user` / `authToken` / `container` |
+| `unmount` | 是 | 清空已保存的 props 引用 |
+| `update` | 可选 | 主应用更新用户或 token 时同步，不重新发明一套路由 |
 
 ```ts
-export async function bootstrap(): Promise<void> {
-  // 仅做幂等准备；每次应用加载调用一次即可。
-}
+export const qiankun = {
+  async bootstrap() {},
+  async mount(props: QiankunProps = {}) {
+    qiankunProps = props;
+  },
+  async update(props: QiankunProps = {}) {
+    qiankunProps = props;
+  },
+  async unmount() {
+    qiankunProps = {};
+  },
+};
 ```
 
-### mount
+不要在业务组件里 `createRoot`。挂载与卸载由 Umi 负责。
 
-每次 `mount` 时：
+## 布局
 
-1. 把 `MicroAppProps` 存入适配器上下文。
-2. 通过 `resolveMountNode(props.container)` 解析挂载节点。
-3. 创建**新的** `createRoot(mountNode)`。
-4. 创建**新的** `BrowserRouter`，`basename = props.routeBase ?? '/'`。
-5. 把 `user`、`authToken`、`navigate` 和全局状态操作传入应用 Provider。
-6. 渲染 `<App />`。
+`src/app.ts` 的 `layout`：
 
-```ts
-let root: Root | null = null;
-
-export async function mount(props: MicroAppProps): Promise<void> {
-  const mountNode = resolveMountNode(props.container);
-  root = createRoot(mountNode);
-  root.render(
-    <BrowserRouter basename={props.routeBase ?? '/'}>
-      <MicroAppProvider value={props}>
-        <App />
-      </MicroAppProvider>
-    </BrowserRouter>,
-  );
-}
-```
-
-### update（可选）
-
-实现时比较 props，更新认证上下文和路由 basename，且不泄漏上次的订阅。
-
-### unmount
-
-`unmount` 必须幂等且完整：
-
-1. 中止所有进行中的 HTTP 请求（共享 `AbortController` 注册表）。
-2. 清除应用注册的 interval 和 timeout。
-3. 通过 `offGlobalStateChange` 或已保存的 disposer 取消全局状态监听。
-4. 移除 mount 之后注册的 window / document 监听。
-5. 调用 `root.unmount()`，然后把 `root` 设为 `null`。
-6. 清除适配器持有的 props 引用。
-
-```ts
-export async function unmount(): Promise<void> {
-  abortAllRequests();
-  clearAllTimers();
-  disposeAllSubscriptions();
-  root?.unmount();
-  root = null;
-}
-```
+- **开发环境**：渲染 Pro Layout 侧栏，便于独立调试
+- **生产环境**：`menuRender: false`、`menuHeaderRender: false`，避免与主应用导航重复
 
 ## 路由
 
 | 关注点 | 规则 |
 | --- | --- |
-| 独立运行 basename | 始终为 `'/'` |
-| 嵌入 basename | 使用主应用传入的 `props.routeBase`；省略时默认 `'/'` |
-| 应用内链接 | 使用 React Router 的 `<Link>` / `useNavigate`；路径相对 basename |
-| 跨应用跳转 | 调用 `props.navigate?.(absoluteHostPath)`；不要为了主应用路由去改 `window.location` |
-| 路由守卫 | 从注入的 `user` 或认证上下文读权限，不要读 qiankun 全局变量 |
-
-主应用注入示例：
-
-```ts
-// 主应用以 activeRule '/admin/inventory' 注册微应用
-mount({ routeBase: '/admin/inventory', container, user, authToken, navigate });
-```
-
-内部路由 `/items` 在浏览器中解析为 `/admin/inventory/items`。
-
-## 全局状态
-
-在适配器中订阅，向业务层暴露类型化 hook：
-
-```ts
-// 适配器在每次 mount 注册一次
-props.onGlobalStateChange?.((state, prev) => {
-  microAppStore.setGlobalState(state);
-}, true);
-```
-
-卸载时调用 `offGlobalStateChange`，或主应用实现返回的 disposer。
+| 清单 | 只维护 `src/router/routes.ts`，由 `.umirc.ts` 引入 |
+| 应用内跳转 | `history` / `useSearchParams`（`umi` 或 `@umijs/max`） |
+| 跨应用跳转 | 交给主应用；子应用不要改 `window.location` 去切主应用路由 |
+| 权限 | 路由项的 `access` 字段指向 `src/access.ts` 的开关 |
 
 ## 认证传递
 
 | 字段 | 用途 |
 | --- | --- |
-| `user` | 初始化 RBAC 上下文；驱动菜单、路由守卫和操作可见性 |
-| `authToken` | 作为 `Authorization` 头交给 HTTP 适配器 |
-| `navigate` | API 返回 401 时跳转到主应用登录 |
+| `user` | 初始化 `App.InitialState`，驱动 `access.ts`、菜单和操作 |
+| `authToken` | 需要时写入请求头；默认 cookie 凭证见 `src/utils/request.ts` 的 `credentials: 'include'` |
 
-独立运行模式提供带至少两种角色的 Mock `UserIdentity`，用于权限测试。
+独立运行时 `user` 可为空；`access.ts` 将空用户视为可验证全部开关的本地管理员。嵌入模式必须传入带 `permissions` 的 `user`。
 
 ## 样式隔离
 
-- 为 Ant Design `ConfigProvider` 配置应用级 `prefixCls` 和 CSS 变量前缀。
-- 自定义样式放在应用命名空间下（见 `references/design-system.md`）。
-- 页面不要注入无前缀的全局选择器。
+- 通过 Umi `antd` 插件使用 `ConfigProvider`；不要在 pages 里再包一层全局 Provider。
+- 自定义样式放在组件旁 Less 或 Tailwind；不要使用会泄漏到主应用的无前缀元素选择器。
 - 不为 Ant Design 浮层强制要求 Shadow DOM。
-
-## 挂载失败处理
-
-若 `resolveMountNode` 抛错或 `mount` 拒绝：
-
-1. 记录应用名和生命周期阶段。
-2. 容器可用时，在其中渲染可恢复降级（带重试说明的 Ant Design `Result`）。
-3. 不要留下半成品 Root、悬挂监听或未清理的定时器。
-
-## 文件布局
-
-```text
-src/micro-app/
-├── contracts.ts      # MicroAppProps 及相关类型
-├── lifecycle.ts      # bootstrap / mount / unmount / update
-├── adapter.ts        # isQiankunRuntime、resolveMountNode、清理注册表
-├── provider.tsx      # props 的 React context
-└── cleanup.ts        # 请求中止 / 定时器 / 订阅注册表
-```
 
 ## 生成检查清单
 
-- [ ] 从 qiankun 入口导出全部四个生命周期钩子。
-- [ ] 每次 `mount` 使用全新的 React Root 和 Router。
-- [ ] 挂载节点在 `props.container` 内解析。
-- [ ] `unmount` 中止请求，并清除订阅 / 定时器 / 监听。
-- [ ] 独立运行 basename 为 `/`；嵌入模式使用 `props.routeBase`。
-- [ ] `src/micro-app/` 之外没有 qiankun 导入。
+- [ ] `.umirc.ts` 包含 `qiankun.slave` 与 `antd`
+- [ ] `src/app.ts` 导出 `qiankun` 的 bootstrap / mount / unmount
+- [ ] 生产环境隐藏子应用侧栏
+- [ ] pages / features 不导入 qiankun、不读取 `__POWERED_BY_QIANKUN__`
+- [ ] 路由与权限分别只来自 `src/router/routes.ts` 与 `src/access.ts`
