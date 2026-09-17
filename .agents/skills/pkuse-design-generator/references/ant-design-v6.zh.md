@@ -255,7 +255,7 @@ Ant Design 是蚂蚁集团用于交付企业软件的开源设计系统，主要
 
 永远不要在产品代码里写死 `#FFF` 或 `#FAFAFA`。读 Token。三层模型让暗色算法可以翻转表面阶梯而不拆布局。
 
-## 海拔与层次
+## 层级与深度
 
 Ant Design 是 **flat-first（扁平优先）**。层级由边框和色调对比承担。阴影只出现在真正浮于上下文之上的表面。
 
@@ -296,7 +296,7 @@ Ant Design 是 **flat-first（扁平优先）**。层级由边框和色调对比
 - **Button（default）** —— 次要操作。白表面上透明背景、深色文字、1px 描边。悬停把文字色改为 `#4096FF`；边框跟着变色。
 - **Input field** —— 32px 高，与按钮对齐。细 1px 描边；焦点态把边框加粗为主色并加上内发光。占位文字使用 `on-surface-disabled`。
 - **Select** —— 视觉上与 Input 相同。触发器在交互前读起来就像输入框。
-- **Card** —— 工作马容器。白表面、8px 圆角、可选 `boxShadowCard` 海拔。内边距四边 24px；嵌套控件保持 16px 间隙。
+- **Card** —— 工作马容器。白表面、8px 圆角、可选 `boxShadowCard` 层级。内边距四边 24px；嵌套控件保持 16px 间隙。
 - **Modal** —— 与 Card 同表面和圆角，但使用次级阴影档，居中叠在 `rgba(0, 0, 0, 0.45)` 遮罩上。主体 padding 为上下 20px × 左右 24px。
 - **Menu（选中项）** —— `#E6F4FF` 背景、`primary` 文字。这是导航里“你在这里”的唯一视觉线索。
 - **Tabs（激活项）** —— `primary` 文字和 2px `primary` 下划线。未激活 Tab 为 `on-surface-variant`。任何状态下 Tab 都没有背景填充。

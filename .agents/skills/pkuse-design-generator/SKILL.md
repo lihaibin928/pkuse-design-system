@@ -5,7 +5,7 @@ description: Generates complete enterprise React admin sub-applications using Um
 
 # PKUSE Design Generator
 
-生成完整可运行的企业后台子应用，而不是组件展览。工程结构以 `project-struct-react/` 与 `references/engineering.md` 为准。
+生成完整可运行的企业后台子应用，而不是组件展览。工程结构以 `assets/base-app/` 脚手架模板与 `references/engineering.md` 为准。
 
 对用户的全部回复使用简体中文：询问补全信息、进度说明、校验结果和最终汇报均用中文。代码标识符、命令、路径、权限码和 Token 名称保持原样。
 

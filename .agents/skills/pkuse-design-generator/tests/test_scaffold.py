@@ -1,4 +1,4 @@
-# .cursor/skills/pkuse-design-generator/tests/test_scaffold.py
+# .agents/skills/pkuse-design-generator/tests/test_scaffold.py
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import importlib.util

@@ -1,4 +1,4 @@
-# .cursor/skills/pkuse-design-generator/tests/test_skill_structure.py
+# .agents/skills/pkuse-design-generator/tests/test_skill_structure.py
 from pathlib import Path
 import re
 import unittest

@@ -145,7 +145,7 @@ export function DesignPreview() {
             ["色彩", "#colors"],
             ["字体", "#type"],
             ["布局", "#layout"],
-            ["海拔与动效", "#elevation"],
+            ["层级与深度", "#elevation"],
             ["形状", "#shapes"],
             ["组件选用", "#choose"],
             ["组件外观", "#components"],
@@ -473,9 +473,9 @@ export function DesignPreview() {
       </div>
 
       <div id="elevation">
-        <Card title="海拔与动效">
+        <Card title="层级与深度">
           <Paragraph>
-            Ant Design 是 flat-first。层级由边框和色调对比承担。阴影只出现在真正浮于上下文之上的表面。
+            Pkuse Design 采用 flat-first（扁平优先）。层级由边框和色调对比承担。阴影只出现在真正浮于上下文之上的表面。
           </Paragraph>
           <Row gutter={[16, 16]}>
             <Col xs={24} md={12}>

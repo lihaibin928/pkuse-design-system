@@ -1,6 +1,6 @@
 # 工程规则
 
-生成的子应用以 `project-struct-react/` 为工程结构基准，使用 **Umi Max**、TypeScript、Ant Design、Ant Design Pro Components。除非用户明确要求更换技术栈，否则遵循本目录和约束。视觉 Token 与组件选用仍遵循 `references/design-system.md`。
+生成的子应用以 `assets/base-app/` 脚手架模板为工程结构基准，使用 **Umi Max**、TypeScript、Ant Design、Ant Design Pro Components。除非用户明确要求更换技术栈，否则遵循本目录和约束。视觉 Token 与组件选用仍遵循 `references/design-system.md`。
 
 ## 技术栈
 
