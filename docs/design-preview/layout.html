@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>布局 · Pkuse Design 设计规范</title>
+  <link rel="stylesheet" href="assets/theme.css" />
+</head>
+<body data-page="layout">
+  <div class="shell">
+    <nav id="site-nav"></nav>
+    <main>
+<h2 id="layout">布局</h2>
+      <div class="card">
+        <p>所有间距对齐 <strong>4px 网格</strong>。六档间距（<code>unit</code> / <code>xs</code> / <code>sm</code> / <code>md</code> / <code>lg</code> / <code>xl</code> → 4 / 4 / 8 / 16 / 24 / 32）覆盖系统中每一个间隙、槽和内边距。Token 驱动的代码里不出现魔法数字。输入框水平 11px 内边距是网格确立前的历史值；一像素迁移会牵动海量已有屏幕，因此保留。</p>
+        <div class="space-row">
+          <div class="space-box" style="width:4px;height:24px">4</div>
+          <div class="space-box" style="width:8px;height:32px">8</div>
+          <div class="space-box" style="width:16px;height:40px">16</div>
+          <div class="space-box" style="width:24px;height:48px">24</div>
+          <div class="space-box" style="width:32px;height:56px">32</div>
+        </div>
+        <p class="note" style="margin-top:16px">控件高度 <code>control-height</code> = 32px。</p>
+
+        <h3>三层表面模型</h3>
+        <p>永远不要在产品代码里写死 <code>#FFF</code> 或 <code>#FAFAFA</code>。读 Token。三层模型让暗色算法可以翻转表面阶梯而不拆布局。</p>
+        <div class="layers">
+          <p class="note" style="margin-top:0">1. bg-layout #F5F5F5 — 页面背景，包围并容纳其他一切。</p>
+          <div class="layer-container">
+            <p>2. bg-container #FFFFFF — 卡片、面板、表格、表单。大多数内容住在这里。</p>
+            <div class="layer-elevated">
+              <strong>3. bg-elevated #FFFFFF</strong>
+              <p class="note">与 container 同 hex，靠阴影区分。用于对话框、下拉、气泡。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="assets/layout.js"></script>
+</body>
+</html>

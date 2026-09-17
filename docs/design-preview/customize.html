@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>定制 · Pkuse Design 设计规范</title>
+  <link rel="stylesheet" href="assets/theme.css" />
+</head>
+<body data-page="customize">
+  <div class="shell">
+    <nav id="site-nav"></nav>
+    <main>
+<h2 id="customize">定制</h2>
+      <div class="card">
+        <p>YAML 中的每个值都是 <code>defaultAlgorithm</code> 产出的<strong>默认值</strong>——浅色主题。Ant Design 主题化比替换 Design Token 更广：包含算法派生、组件级覆盖、动态切换、嵌套主题作用域、CSS 变量输出、静态 Token 消费，以及零运行时 CSS 提取。完整运行时 API 见 <a href="https://ant.design/docs/react/customize-theme">Customize Theme</a>。</p>
+        <p>主题配置入口是 <code>ConfigProvider</code> 的 <code>theme</code>：</p>
+        <ol class="steps">
+          <li><strong>Seed token 覆盖。</strong>传 <code>theme.token</code> 替换任意种子。主色和语义色种子会展开为派生阶梯；<code>colorBgBase</code> 与 <code>colorTextBase</code> 驱动中性表面和文字。间距、圆角、字号种子同理。</li>
+          <li><strong>算法切换。</strong>设 <code>theme.algorithm</code> 换派生逻辑。<code>defaultAlgorithm</code>、<code>darkAlgorithm</code>、<code>compactAlgorithm</code> 可单独或组成数组使用——不要手工反色；算法会处理非线性的色板、表面、阴影和尺寸关系。</li>
+          <li><strong>组件级覆盖。</strong><code>theme.components.Button</code>（或任一组件 Token 命名空间）可覆盖单个组件的 Component Token 和所消费的 Alias Token，不影响其他组件。组件配置里的 <code>algorithm</code> 可让该覆盖仍跟随种子关系。</li>
+          <li><strong>运行时作用域。</strong>改 <code>ConfigProvider.theme</code> 可动态切换；嵌套 ConfigProvider 创建局部主题，未改的 Token 从父级继承。静态 API（<code>message.xxx</code>、<code>Modal.xxx</code>、<code>notification.xxx</code>）不会自动拿到周围上下文；需要主题化静态反馈时，用 hook API、<code>App</code> 或显式 context holder。</li>
+          <li><strong>Token 消费与输出。</strong>React 内用 <code>theme.useToken()</code>，React 外用 <code>theme.getDesignToken()</code>。需要 CSS 变量时用 <code>theme.cssVar</code>；必须关闭运行时样式生成时用 <code>theme.zeroRuntime</code> 配合预构建或提取的 CSS。</li>
+        </ol>
+        <p>自定义主题时，先保住 Ant Design 的交互结构、密度、状态反馈和组件语义，再改最小必要种子集：通常是 <code>colorPrimary</code>、状态色、<code>borderRadius</code>、<code>fontFamily</code>、<code>fontSize</code> 和中性表面基色。品牌页可以看起来不同，但表单、表格、导航、浮层、焦点态和校验反馈仍应像 Ant Design。避免生成绕过 Token、算法、<code>theme.components</code>、CSS 变量或提取静态样式的自定义 CSS；若主题无法通过这些官方层表达，应视为设计系统扩展，而不是页面一次性样式。</p>
+      </div>
+    </main>
+  </div>
+  <script src="assets/layout.js"></script>
+</body>
+</html>

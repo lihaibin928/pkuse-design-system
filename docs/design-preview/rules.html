@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>对与错 · Pkuse Design 设计规范</title>
+  <link rel="stylesheet" href="assets/theme.css" />
+</head>
+<body data-page="rules">
+  <div class="shell">
+    <nav id="site-nav"></nav>
+    <main>
+<h2 id="rules">对与错</h2>
+      <div class="compare">
+        <div class="ok">
+          <h3>做</h3>
+          <p>用四个设计价值观当平局裁决。两种做法冲突时，更能让用户状态确定、更易读的那个胜出。</p>
+          <p>从 <code>colors.surface</code>、<code>surface-container</code>、<code>surface-layout</code> 读表面。它们对应三层模型。</p>
+          <p>找不到更具体 Token 时，组件级过渡用 <code>motionDurationMid</code>（0.2s）。</p>
+          <p>预设色板（blue 到 lime）只留给标签、图表和分类可视化。</p>
+          <p>每一个间隙、内边距和槽都通过间距刻度对齐 4px 网格。</p>
+        </div>
+        <div class="bad">
+          <h3>不做</h3>
+          <p>同一表面不要叠两个主色按钮。只留一个，其余降为 default。</p>
+          <p>不要硬编码 <code>#FFFFFF</code> 或 <code>#FAFAFA</code>。hex 是附带结果，角色才重要。</p>
+          <p>不要发明自定义 <code>cubic-bezier</code>。用已命名缓动。</p>
+          <p>不要在预设色板外铸造强调色给一次性 UI。若某屏看起来需要，多半该改布局。</p>
+          <p>不要在产品代码里用魔法数字。刻度缺一档时，该重看设计，而不是一像素覆盖。</p>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="assets/layout.js"></script>
+</body>
+</html>

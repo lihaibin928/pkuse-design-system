@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>色彩 · Pkuse Design 设计规范</title>
+  <link rel="stylesheet" href="assets/theme.css" />
+</head>
+<body data-page="colors">
+  <div class="shell">
+    <nav id="site-nav"></nav>
+    <main>
+<h2 id="colors">色彩</h2>
+      <div class="card">
+        <p>色板由一个<strong>主色</strong>种子、四个语义状态种子（<code>success</code> / <code>warning</code> / <code>error</code> / <code>info</code>）以及文字与表面的中性色构成。种子经 <code>@ant-design/colors</code> 自动展开为背景浅色、悬停、按下和描边阶梯——改种子，整套派生色一起移动。</p>
+        <p><code>#1677FF</code> 被选为主色，因为蓝色读起来可信、专注，既没有更深海军蓝的刻板，也没有高饱和青色的俏皮。它是操作、链接、焦点环、选中导航和激活 Tab 的默认品牌色。</p>
+        <div class="callout">无障碍说明：本文记录的是 Ant Design 的默认视觉 Token。部分品牌色组合（尤其是白字配 <code>#1677FF</code>，以及主文字配浅选中底）低于 WCAG AA 小字 4.5:1 对比度阈值。若需严格无障碍，通过 ConfigProvider 加深 <code>colorPrimary</code>，或做组件级 Token 覆盖，不要发明一次性颜色。</div>
+
+        <h3>品牌与语义</h3>
+        <div class="swatches">
+          <div class="swatch"><div class="chip" style="background:#1677FF"></div><div class="meta"><strong>primary</strong><code>#1677FF</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#4096FF"></div><div class="meta"><strong>primary hover</strong><code>#4096FF</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#0958D9"></div><div class="meta"><strong>primary active / blue-7</strong><code>#0958D9</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#E6F4FF"></div><div class="meta"><strong>选中底 / info 浅底</strong><code>#E6F4FF</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#52C41A"></div><div class="meta"><strong>success</strong><code>#52C41A · 仅状态</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#FAAD14"></div><div class="meta"><strong>warning / gold</strong><code>#FAAD14</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#FF4D4F"></div><div class="meta"><strong>error</strong><code>#FF4D4F</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#1677FF"></div><div class="meta"><strong>info / blue</strong><code>#1677FF</code></div></div>
+        </div>
+
+        <h3>中性：文字与表面</h3>
+        <div class="swatches">
+          <div class="swatch"><div class="chip" style="background:#1F1F1F"></div><div class="meta"><strong>on-surface</strong><code>#1F1F1F · α 0.88</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#595959"></div><div class="meta"><strong>on-surface-variant</strong><code>#595959 · α 0.65</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#BFBFBF"></div><div class="meta"><strong>on-surface-disabled</strong><code>#BFBFBF · α 0.25</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#FFFFFF;border-bottom:1px solid #F0F0F0"></div><div class="meta"><strong>surface / elevated</strong><code>#FFFFFF</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#FAFAFA"></div><div class="meta"><strong>surface-container</strong><code>#FAFAFA</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#F5F5F5"></div><div class="meta"><strong>surface-layout</strong><code>#F5F5F5</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#D9D9D9"></div><div class="meta"><strong>outline</strong><code>#D9D9D9</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#F0F0F0"></div><div class="meta"><strong>outline-variant</strong><code>#F0F0F0</code></div></div>
+        </div>
+        <p class="note">运行时中性文字和叠层用 <code>rgba(0, 0, 0, α)</code>，而不是实心灰。原因是叠层：文字压在浅色卡片或彩色单元格上时，实心灰会切断底色，透明黑会自然混合。四级透明度：<code>0.88</code> 主文字、<code>0.65</code> 次文字、<code>0.45</code> 三级/描述、<code>0.25</code> 占位/禁用。文档中的 hex 是叠在白底上的等效结果，供静态导出；能走 alpha 的下游应优先用 <code>@ant-design/cssinjs</code> 的 <code>rgba()</code>。</p>
+        <div class="alpha-row">
+          <div class="alpha-card">
+            <div class="alpha-on-white" style="color:rgba(0,0,0,0.88)">主文字 0.88</div>
+            <div class="alpha-on-tint" style="color:rgba(0,0,0,0.88)">叠在选中底上</div>
+          </div>
+          <div class="alpha-card">
+            <div class="alpha-on-white" style="color:rgba(0,0,0,0.65)">次文字 0.65</div>
+            <div class="alpha-on-tint" style="color:rgba(0,0,0,0.65)">叠在选中底上</div>
+          </div>
+          <div class="alpha-card">
+            <div class="alpha-on-white" style="color:rgba(0,0,0,0.45)">描述文字 0.45</div>
+            <div class="alpha-on-tint" style="color:rgba(0,0,0,0.45)">叠在选中底上</div>
+          </div>
+          <div class="alpha-card">
+            <div class="alpha-on-white" style="color:rgba(0,0,0,0.25)">占位/禁用 0.25</div>
+            <div class="alpha-on-tint" style="color:rgba(0,0,0,0.25)">叠在选中底上</div>
+          </div>
+        </div>
+
+        <h3>预设色 · 只给标签、图表和分类可视化</h3>
+        <p class="lead">不要把预设色当成主操作色。状态用语义色，主操作只用 primary。<code>pink</code> 在运行时 Token 中是 <code>magenta</code> 的已弃用别名。</p>
+        <div class="swatches">
+          <div class="swatch"><div class="chip" style="background:#1677FF"></div><div class="meta"><strong>blue</strong><code>#1677FF</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#722ED1"></div><div class="meta"><strong>purple</strong><code>#722ED1</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#13C2C2"></div><div class="meta"><strong>cyan</strong><code>#13C2C2</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#52C41A"></div><div class="meta"><strong>green</strong><code>#52C41A</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#EB2F96"></div><div class="meta"><strong>magenta</strong><code>#EB2F96</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#F5222D"></div><div class="meta"><strong>red</strong><code>#F5222D</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#FA8C16"></div><div class="meta"><strong>orange</strong><code>#FA8C16</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#FADB14"></div><div class="meta"><strong>yellow</strong><code>#FADB14</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#FA541C"></div><div class="meta"><strong>volcano</strong><code>#FA541C</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#2F54EB"></div><div class="meta"><strong>geekblue</strong><code>#2F54EB</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#FAAD14"></div><div class="meta"><strong>gold</strong><code>#FAAD14</code></div></div>
+          <div class="swatch"><div class="chip" style="background:#A0D911"></div><div class="meta"><strong>lime</strong><code>#A0D911</code></div></div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="assets/layout.js"></script>
+</body>
+</html>

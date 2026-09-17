@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>数据录入 · Pkuse Design 设计规范</title>
+  <link rel="stylesheet" href="assets/theme.css" />
+</head>
+<body data-page="scene-entry">
+  <div class="shell">
+    <nav id="site-nav"></nav>
+    <main>
+<h2 id="scene-entry">数据录入</h2>
+      <p class="lead">现场信息登记表单：必填校验、录入规范与提交反馈。属于 Pkuse Design 场景原型，落地实现以 skill 生成的真实应用为准。</p>
+
+      <div class="card">
+        <div style="max-width:520px">
+          <div class="form-item" id="itemName">
+            <label><span class="req">*</span>姓名</label>
+            <input class="input" id="fieldName" placeholder="请输入姓名" />
+            <div class="error-text" id="nameError">请输入姓名</div>
+          </div>
+          <div class="form-item" id="itemPhone">
+            <label><span class="req">*</span>手机号</label>
+            <input class="input" id="fieldPhone" placeholder="请输入11位手机号" maxlength="11" />
+            <div class="error-text" id="phoneError">请输入正确的11位手机号</div>
+          </div>
+          <div class="form-item">
+            <label>部门</label>
+            <select class="input" id="fieldDept">
+              <option>研发部</option>
+              <option>产品部</option>
+              <option>运营部</option>
+            </select>
+          </div>
+          <div class="form-item">
+            <label>登记类型</label>
+            <div class="radio-row" id="typeRow">
+              <label class="radio-pill checked"><input type="radio" name="regType" value="个人登记" checked onchange="pickType(this)" />个人登记</label>
+              <label class="radio-pill"><input type="radio" name="regType" value="团体登记" onchange="pickType(this)" />团体登记</label>
+            </div>
+          </div>
+          <div class="form-item">
+            <label>备注</label>
+            <textarea class="input" id="fieldRemark" rows="3" placeholder="选填，补充说明信息"></textarea>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-primary" type="button" onclick="submitEntry()">提 交</button>
+            <button class="btn-default" type="button" onclick="resetEntry()">重 置</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="assets/layout.js"></script>
+  <div class="toast" id="toast"><span class="toast-icon">✓</span><span id="toastText"></span></div>
+
+  <script>
+    var toastTimer = null;
+
+    function $(id) { return document.getElementById(id); }
+
+    function pickType(input) {
+      document.querySelectorAll('#typeRow .radio-pill').forEach(function (el) { el.classList.remove('checked'); });
+      input.parentElement.classList.add('checked');
+    }
+
+    function submitEntry() {
+      var name = $('fieldName').value.trim();
+      var phone = $('fieldPhone').value.trim();
+      var nameOk = !!name;
+      var phoneOk = /^1\d{10}$/.test(phone);
+      $('itemName').classList.toggle('invalid', !nameOk);
+      $('nameError').style.display = nameOk ? 'none' : 'block';
+      $('itemPhone').classList.toggle('invalid', !phoneOk);
+      $('phoneError').style.display = phoneOk ? 'none' : 'block';
+      if (!nameOk || !phoneOk) return;
+      var type = document.querySelector('input[name="regType"]:checked').value;
+      showToast('提交成功：' + name + ' · ' + type);
+      resetEntry();
+    }
+    function resetEntry() {
+      $('fieldName').value = '';
+      $('fieldPhone').value = '';
+      $('fieldRemark').value = '';
+      $('fieldDept').selectedIndex = 0;
+      var first = document.querySelector('#typeRow input');
+      first.checked = true;
+      pickType(first);
+      $('itemName').classList.remove('invalid');
+      $('nameError').style.display = 'none';
+      $('itemPhone').classList.remove('invalid');
+      $('phoneError').style.display = 'none';
+    }
+
+    function showToast(text) {
+      var t = $('toast');
+      $('toastText').textContent = text;
+      t.style.display = 'flex';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { t.style.display = 'none'; }, 2000);
+    }
+  </script>
+</body>
+</html>

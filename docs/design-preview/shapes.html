@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>形状 · Pkuse Design 设计规范</title>
+  <link rel="stylesheet" href="assets/theme.css" />
+</head>
+<body data-page="shapes">
+  <div class="shell">
+    <nav id="site-nav"></nav>
+    <main>
+<h2 id="shapes">形状</h2>
+      <div class="card">
+        <p>默认圆角是 <strong>6px</strong>。足够现代亲和，又小到 32px 高的按钮仍接近矩形，适合密集表单。</p>
+        <div class="radius-row">
+          <div class="radius-demo" style="border-radius:0">none 0</div>
+          <div class="radius-demo" style="border-radius:2px">sm 2</div>
+          <div class="radius-demo" style="border-radius:4px">md 4</div>
+          <div class="radius-demo" style="border-radius:6px">DEFAULT 6</div>
+          <div class="radius-demo" style="border-radius:8px">lg 8</div>
+          <div class="radius-demo" style="border-radius:16px">xl 16</div>
+          <div class="radius-demo" style="width:48px;border-radius:9999px">full</div>
+        </div>
+        <ul>
+          <li><strong>控件</strong>（按钮、输入、选择、下拉触发）— 6px（<code>rounded.DEFAULT</code>）。</li>
+          <li><strong>表面</strong>（卡片、对话框、抽屉、通知）— 8px（<code>rounded.lg</code>）。</li>
+          <li><strong>标签和小芯片</strong> — 4px（<code>rounded.md</code>）。</li>
+          <li><strong>Tooltip 和气泡</strong> — 4px（<code>rounded.md</code>）。</li>
+          <li>全胶囊（<code>rounded.full</code>，9999px）只给圆形头像、徽标和圆点，<strong>不给按钮或标签</strong>。</li>
+          <li>直角（0px）留给表格和分段控件内边。</li>
+        </ul>
+        <p class="note">相邻元素混用圆角是坏味道：8px 卡片里不该放 16px 圆角按钮。</p>
+      </div>
+    </main>
+  </div>
+  <script src="assets/layout.js"></script>
+</body>
+</html>

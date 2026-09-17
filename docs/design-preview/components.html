@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>组件 · Pkuse Design 设计规范</title>
+  <link rel="stylesheet" href="assets/theme.css" />
+</head>
+<body data-page="components">
+  <div class="shell">
+    <nav id="site-nav"></nav>
+    <main>
+<h2 id="components">组件</h2>
+      <div class="card">
+        <h3>Button · primary</h3>
+        <p class="note">每个屏幕唯一的主导操作。实心主色、白字、32px 高、6px 圆角。悬停变 <code>#4096FF</code>，按下变 <code>#0958D9</code>。同一决策面不要叠两个主按钮。</p>
+        <div class="btn-row">
+          <button class="btn-primary" type="button">查询</button>
+          <button class="btn-default" type="button">重置</button>
+          <button class="btn-disabled" type="button" disabled>无权限</button>
+        </div>
+
+        <h3>Button · default</h3>
+        <p class="note">次要操作。白底透明填充、深色文字、1px 描边。悬停文字与边框变为 <code>#4096FF</code>。</p>
+
+        <h3>Input / Select</h3>
+        <p class="note">32px 高，与按钮对齐。细 1px 描边；焦点加粗主色边并带内发光。占位符用 <code>on-surface-disabled</code>。Select 在交互前看起来像 Input。</p>
+        <div class="form-row">
+          <input class="input" placeholder="请输入关键词" />
+          <select class="input" style="width:160px"><option>全部仓库</option><option>华东仓</option></select>
+        </div>
+
+        <h3>Card</h3>
+        <p class="note">工作马容器。白表面、8px 圆角、可选 <code>boxShadowCard</code>。内边距四边 24px；嵌套控件保持 16px 间隙。</p>
+        <div class="demo-card">卡片内容区，内边距 24px。</div>
+
+        <h3>Modal</h3>
+        <p class="note">与 Card 同表面和圆角，但用次级阴影，居中叠在 <code>rgba(0,0,0,0.45)</code> 遮罩上。主体 padding 上下 20px、左右 24px。</p>
+        <div class="modal-stage">
+          <div class="modal-mask"></div>
+          <div class="modal-panel">
+            <span class="modal-close">×</span>
+            <h4 style="margin-top:0;font-size:16px;line-height:24px">确认提交</h4>
+            <p class="note">对话框示范：elevated 表面 + popup 阴影 + 45% 遮罩。</p>
+            <div class="btn-row">
+              <button class="btn-primary" type="button">确定</button>
+              <button class="btn-default" type="button">取消</button>
+            </div>
+          </div>
+        </div>
+
+        <h3>Menu · 选中项</h3>
+        <p class="note"><code>#E6F4FF</code> 背景 + 主色文字。这是导航里“你在这里”的唯一视觉线索。</p>
+        <div class="menu">
+          <div class="menu-item selected">库存查询</div>
+          <div class="menu-item">出入库</div>
+          <div class="menu-item">盘点任务</div>
+        </div>
+
+        <h3>Menu · 场景菜单（多级）</h3>
+        <p class="note">内联多级菜单：父级子菜单可展开收起（箭头旋转 0.2s），子项按层级缩进 24px；选中项 <code>#E6F4FF</code> 底 + 主色文字。</p>
+        <div class="menu">
+          <details class="menu-sub" open>
+            <summary class="menu-item menu-sub-title">场景菜单<span class="menu-arrow">▾</span></summary>
+            <div class="menu-sub-children">
+              <div class="menu-item selected">数据录入</div>
+              <div class="menu-item">数据展示</div>
+              <div class="menu-item">系统配置</div>
+            </div>
+          </details>
+          <div class="menu-item">全局设置</div>
+        </div>
+
+        <h3>Tabs · 激活项</h3>
+        <p class="note">主色文字 + 2px 主色下划线。未激活为 <code>on-surface-variant</code>。任何状态下 Tab 都没有背景填充。</p>
+        <div class="tabs">
+          <button class="tab active" type="button">概览</button>
+          <button class="tab" type="button">明细</button>
+          <button class="tab" type="button">日志</button>
+        </div>
+
+        <h3>Table · 表头</h3>
+        <p class="note"><code>surface-container</code> 背景，<code>title-md</code>（14px / 600）。表体只在悬停时变底，默认不做斑马纹——系统相信用户能读密集数据。</p>
+        <table class="demo-table">
+          <thead><tr><th>名称</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr><td>劳保手套</td><td><span class="tag tag-green">正常</span></td><td><a href="#components">详情</a></td></tr>
+            <tr><td>扫描枪</td><td><span class="tag tag-blue">盘点中</span></td><td><a href="#components">详情</a></td></tr>
+          </tbody>
+        </table>
+
+        <h3>Tag</h3>
+        <p class="note">小分类标签。4px 圆角、12px 字、低饱和粉彩来自预设色板。关键状态不要用 Tag，用 Alert 或 Badge。</p>
+        <div class="btn-row">
+          <span class="tag">默认</span>
+          <span class="tag tag-blue">分类 · blue</span>
+          <span class="tag tag-green">分类 · 非状态主操作</span>
+        </div>
+
+        <h3>Alert</h3>
+        <p class="note">语义反馈表面。成功/警告/错误/信息用浅语义底 + 正常文字色；状态由图标和底色传达，不用低对比的彩色正文。</p>
+        <div class="alert alert-success"><span class="alert-icon" style="background:#52C41A">✓</span>成功：只用 success 绿提示结果，不要把整页做成绿色。</div>
+        <div class="alert alert-warning"><span class="alert-icon" style="background:#FAAD14">!</span>警告：空数据用 Empty，保留查询区。</div>
+        <div class="alert alert-error"><span class="alert-icon" style="background:#FF4D4F">×</span>错误：用 Result；401 和 403 分开。</div>
+        <div class="alert alert-info"><span class="alert-icon" style="background:#1677FF">i</span>信息：加载中用 Spin，不要换一套绿色骨架屏。</div>
+
+        <h3>Badge status</h3>
+        <p class="note">紧凑状态点。危急可用 error 填充，但在无障碍关键流程里圆点不能代替文字。</p>
+        <p><span class="badge"></span> 故障 &nbsp; <span class="badge" style="background:#52C41A"></span> 正常 &nbsp; <span class="badge" style="background:#FAAD14"></span> 降级</p>
+
+        <h3>Tooltip</h3>
+        <p class="note">高对比反相表面：<code>rgba(0,0,0,0.85)</code> 底、白字。始终由框架定位，不要手动钉死。</p>
+        <span class="tooltip">保存后立即生效</span>
+
+        <h3>Dropdown · 项悬停</h3>
+        <p class="note">悬停用 <code>surface-container</code> 填充，<strong>不改文字色</strong>。悬停提示本身已经足够。</p>
+        <div class="dropdown">
+          <div class="dropdown-item">编辑</div>
+          <div class="dropdown-item">导出</div>
+          <div class="dropdown-item">删除</div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="assets/layout.js"></script>
+</body>
+</html>

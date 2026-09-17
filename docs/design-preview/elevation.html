@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>层级与深度 · Pkuse Design 设计规范</title>
+  <link rel="stylesheet" href="assets/theme.css" />
+</head>
+<body data-page="elevation">
+  <div class="shell">
+    <nav id="site-nav"></nav>
+    <main>
+<h2 id="elevation">层级与深度</h2>
+      <div class="card">
+        <p>Pkuse Design 采用 <strong>flat-first（扁平优先）</strong>。层级由边框和色调对比承担。阴影只出现在真正浮于上下文之上的表面。</p>
+        <p>阴影 Token 由 <code>colorShadow</code> 生成，同一名称可适应浅色/深色。核心档位：</p>
+        <div class="space-row" style="align-items:stretch;margin-bottom:16px">
+          <div class="shadow-box shadow-tertiary" style="flex:1">
+            <h4>Tertiary · boxShadowTertiary</h4>
+            <p class="note">轻抬起：<code>0 1px 2px 0 rgba(0,0,0,0.05), 0 1px 6px -1px rgba(0,0,0,0.03), 0 2px 4px 0 rgba(0,0,0,0.03)</code></p>
+          </div>
+          <div class="shadow-box shadow-popup" style="flex:1">
+            <h4>Popup · boxShadow / boxShadowSecondary</h4>
+            <p class="note">标准浮层：<code>0 6px 16px 0 rgba(0,0,0,0.08), 0 3px 6px -4px rgba(0,0,0,0.12), 0 9px 28px 8px rgba(0,0,0,0.05)</code></p>
+          </div>
+        </div>
+        <ul>
+          <li><strong>Card</strong>（<code>boxShadowCard</code>）— 更紧的卡片抬起阴影，用于卡片需要与容器分离时。</li>
+          <li><strong>Drawer / overflow</strong>（<code>boxShadowDrawer*</code>、<code>boxShadowTabsOverflow*</code>）— 贴边表面和滚动提示。</li>
+          <li><strong>Popover arrow</strong>（<code>boxShadowPopoverArrow</code>）— 只用于 Tooltip / Popover 小三角。</li>
+        </ul>
+        <h3>动效</h3>
+        <p>三种时长和一组 cubic-bezier，全部以 Token 暴露。不要任意挑选 <code>transition-timing-function</code>。需求对不上现有缓动时，用 <code>motionEaseInOut</code> 然后继续。</p>
+        <p class="note">悬停色块查看 0.1s / 0.2s / 0.3s。缓动名称：<code>motionEaseInOut</code>、<code>motionEaseOut</code>、<code>motionEaseIn</code>、<code>motionEaseOutBack</code>、<code>motionEaseOutCirc</code>。</p>
+        <div class="motion-row">
+          <div class="motion-box fast">Fast 0.1s<br />hover / press</div>
+          <div class="motion-box mid">Mid 0.2s<br />折叠 / 淡入</div>
+          <div class="motion-box slow">Slow 0.3s<br />对话框 / 抽屉</div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="assets/layout.js"></script>
+</body>
+</html>

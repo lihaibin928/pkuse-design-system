@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>字体 · Pkuse Design 设计规范</title>
+  <link rel="stylesheet" href="assets/theme.css" />
+</head>
+<body data-page="type">
+  <div class="shell">
+    <nav id="site-nav"></nav>
+    <main>
+<h2 id="type">字体</h2>
+      <div class="card">
+        <p>基础字号是 <strong>14px</strong>，不是 16。企业控制台用信息密度换取额外易读空间——1440px 宽窗口需要同时放下侧栏、顶栏、八列表格和详情。14px 正文在这些栏宽下接近约 75 字符的扫视甜点。</p>
+        <p>字体栈按系统 UI 字体优先：<code>-apple-system</code>、<code>BlinkMacSystemFont</code>、<code>Segoe UI</code>、<code>Roboto</code>、<code>Helvetica Neue</code>、<code>Arial</code>、<code>Noto Sans</code>。代码字体：<code>SFMono-Regular</code>、<code>Consolas</code>、<code>Liberation Mono</code>、<code>Menlo</code>、<code>Courier</code>。</p>
+        <p>产品界面只用<strong>两个字重</strong>：400（正文、控件、菜单项、Tab 标签）和 600（<code>fontWeightStrong</code> —— 标题、表头、任何 title 级文字）。细体（100–300）、粗体（700+）和斜体不用于界面骨架。斜体只允许出现在长文本文档里。选中/激活态的强调来自颜色和描边（边框、下划线），不是字重。</p>
+        <div class="type-row"><span>display-lg 38/600/46</span><div style="font-size:38px;line-height:46px;font-weight:600">展示级标题</div></div>
+        <div class="type-row"><span>headline-lg 30/600/38</span><div style="font-size:30px;line-height:38px;font-weight:600">企业后台标题</div></div>
+        <div class="type-row"><span>headline-md 24/600/32</span><div style="font-size:24px;line-height:32px;font-weight:600">页面中标题</div></div>
+        <div class="type-row"><span>headline-sm 20/600/28</span><div style="font-size:20px;line-height:28px;font-weight:600">区块标题</div></div>
+        <div class="type-row"><span>title-lg 16/600/24</span><div style="font-size:16px;line-height:24px;font-weight:600">卡片标题 / 导航品牌</div></div>
+        <div class="type-row"><span>title-md 14/600/22</span><div style="font-size:14px;line-height:22px;font-weight:600">表格表头 / 强调</div></div>
+        <div class="type-row"><span>body-lg 16/400/24</span><div style="font-size:16px;line-height:24px;font-weight:400">宽松正文</div></div>
+        <div class="type-row"><span>body-md 14/400/22</span><div>默认正文。企业后台用 14px，不是 16px。</div></div>
+        <div class="type-row"><span>body-sm 12/400/20</span><div style="font-size:12px;line-height:20px;color:#595959">辅助说明、标签</div></div>
+        <div class="type-row"><span>code 13/400/20</span><div class="mono">const colorPrimary = token.colorPrimary</div></div>
+      </div>
+    </main>
+  </div>
+  <script src="assets/layout.js"></script>
+</body>
+</html>
