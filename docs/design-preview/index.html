@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PKUSE 设计规范预览 · Ant Design v6</title>
+  <title>Pkuse Design 设计规范预览</title>
   <style>
     :root {
       --primary: #1677FF;
@@ -69,8 +69,7 @@
       border-right: 1px solid var(--outline);
       padding: 24px 16px;
     }
-    nav .brand { font-weight: 600; font-size: 16px; line-height: 24px; margin: 0 0 4px; }
-    nav .meta { color: var(--text-secondary); font-size: 12px; line-height: 20px; margin: 0 0 24px; }
+    nav .brand { font-weight: 600; font-size: 16px; line-height: 24px; margin: 0 0 24px; }
     nav a {
       display: block; padding: 8px 12px; border-radius: var(--radius);
       color: var(--text); margin-bottom: 4px;
@@ -78,8 +77,8 @@
     nav a:hover { background: var(--surface-container); }
     nav a.active, nav a:target { background: var(--primary-bg); color: var(--primary); }
     main { padding: 32px 40px 80px; max-width: 1120px; }
-    h1 { font-size: 30px; line-height: 38px; font-weight: 600; margin: 0 0 8px; }
     h2 { font-size: 20px; line-height: 28px; font-weight: 600; margin: 48px 0 16px; }
+    main > h2:first-child { margin-top: 0; }
     h3 { font-size: 16px; line-height: 24px; font-weight: 600; margin: 24px 0 12px; }
     h4 { font-size: 14px; line-height: 22px; font-weight: 600; margin: 16px 0 8px; }
     .lead { color: var(--text-secondary); margin: 0 0 16px; }
@@ -117,30 +116,38 @@
     .btn-primary:active { background: var(--primary-active); }
     .btn-default { background: var(--surface); color: var(--text); border: 1px solid var(--outline); }
     .btn-default:hover { color: var(--primary-hover); border-color: var(--primary-hover); }
-    .btn-disabled { background: var(--surface-container); color: var(--text-disabled); border: 1px solid var(--outline); }
+    .btn-default:active { color: var(--primary-active); border-color: var(--primary-active); }
+    .btn-disabled { background: var(--surface-layout); color: var(--text-disabled); border: 1px solid var(--outline); }
     .input { border: 1px solid var(--outline); width: 240px; padding: 4px 11px; background: var(--surface); color: var(--text); }
     .input::placeholder { color: var(--text-disabled); }
-    .input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.2); }
+    .input:hover { border-color: var(--primary-hover); }
+    .input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(5, 145, 255, 0.1); }
+    select.input {
+      appearance: none; -webkit-appearance: none; -moz-appearance: none;
+      padding: 4px 28px 4px 11px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 1024' fill='%23BFBFBF'%3E%3Cpath d='M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 11px center;
+      background-size: 12px;
+    }
     table { width: 100%; border-collapse: collapse; }
-    th { background: var(--surface-container); text-align: left; padding: 16px; font-weight: 600; font-size: 14px; line-height: 22px; }
+    th { background: var(--surface-container); text-align: left; padding: 16px; font-weight: 600; font-size: 14px; line-height: 22px; border-bottom: 1px solid var(--outline-variant); }
     td { padding: 16px; border-bottom: 1px solid var(--outline-variant); }
     tbody tr:hover { background: rgba(0, 0, 0, 0.02); }
-    .tag { display: inline-block; padding: 0 7px; border-radius: var(--radius-md); font-size: 12px; line-height: 20px; background: var(--surface-container); }
-    .tag-blue { background: #E6F4FF; color: #0958D9; }
-    .tag-green { background: #F6FFED; color: #389e0d; }
-    .alert { padding: 8px 12px; border-radius: var(--radius-lg); margin-bottom: 8px; }
-    .alert-success { background: #F6FFED; }
-    .alert-warning { background: #FFFBE6; }
-    .alert-error { background: #FFF2F0; }
-    .alert-info { background: #E6F4FF; }
+    .tag { display: inline-block; padding: 0 7px; border-radius: var(--radius-md); font-size: 12px; line-height: 20px; background: var(--surface-container); border: 1px solid var(--outline); }
+    .tag-blue { background: #E6F4FF; color: #0958D9; border-color: #91CAFF; }
+    .tag-green { background: #F6FFED; color: #389e0d; border-color: #B7EB8F; }
+    .alert { display: flex; align-items: flex-start; gap: 8px; padding: 8px 12px; border-radius: var(--radius-lg); margin-bottom: 8px; border: 1px solid transparent; }
+    .alert-success { background: #F6FFED; border-color: #B7EB8F; }
+    .alert-warning { background: #FFFBE6; border-color: #FFE58F; }
+    .alert-error { background: #FFF2F0; border-color: #FFCCC7; }
+    .alert-info { background: #E6F4FF; border-color: #91CAFF; }
+    .alert-icon { flex: none; width: 14px; height: 14px; border-radius: var(--radius-full); color: #fff; font-size: 9px; line-height: 14px; text-align: center; margin-top: 3px; font-weight: 700; }
     .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .ok, .bad { padding: 16px; border-radius: var(--radius); }
     .ok { background: #F6FFED; }
     .bad { background: #FFF2F0; }
     .ok h3, .bad h3 { margin-top: 0; }
-    .choose { width: 100%; }
-    .choose th { width: 22%; }
-    .choose td { vertical-align: top; }
     .ok p, .bad p { margin: 0 0 8px; }
     .values { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .value-card { border: 1px solid var(--outline); border-radius: var(--radius-lg); padding: 16px; }
@@ -163,18 +170,24 @@
       width: 96px; height: 48px; background: var(--primary-bg); border: 1px solid var(--primary);
       display: grid; place-items: center; font-size: 12px; color: var(--primary);
     }
-    .menu { width: 240px; border: 1px solid var(--outline); border-radius: var(--radius); overflow: hidden; }
-    .menu-item { padding: 8px 12px; }
+    .menu { width: 240px; border: 1px solid var(--outline); border-radius: var(--radius-lg); }
+    .menu-item { margin: 4px 8px; padding: 9px 8px; border-radius: var(--radius); }
     .menu-item.selected { background: var(--primary-bg); color: var(--primary); }
-    .tabs { display: flex; gap: 24px; border-bottom: 1px solid var(--outline); }
-    .tab { background: none; border: 0; height: auto; padding: 8px 0; color: var(--text-secondary); border-radius: 0; }
+    .menu-sub { border-radius: var(--radius); }
+    .menu-sub-title { cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none; }
+    .menu-sub-title::-webkit-details-marker { display: none; }
+    .menu-arrow { font-size: 10px; color: var(--text-secondary); transition: transform 0.2s cubic-bezier(0.645, 0.045, 0.355, 1); }
+    .menu-sub[open] > .menu-sub-title .menu-arrow { transform: rotate(180deg); }
+    .menu-sub-children .menu-item { margin-left: 32px; }
+    .tabs { display: flex; gap: 32px; border-bottom: 1px solid var(--outline); }
+    .tab { background: none; border: 0; height: auto; padding: 12px 0; color: var(--text-secondary); border-radius: 0; }
     .tab.active { color: var(--primary); box-shadow: inset 0 -2px 0 var(--primary); font-weight: 400; }
     .tooltip {
       display: inline-block; background: var(--tooltip-bg); color: #fff;
       border-radius: var(--radius-md); padding: 6px 8px;
     }
-    .dropdown { width: 200px; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-popup); padding: 4px 0; }
-    .dropdown-item { padding: 8px 12px; }
+    .dropdown { width: 200px; background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-popup); padding: 4px 0; }
+    .dropdown-item { padding: 5px 12px; border-radius: var(--radius-md); }
     .dropdown-item:hover { background: var(--surface-container); }
     .badge { display: inline-block; width: 6px; height: 6px; border-radius: var(--radius-full); background: var(--error); vertical-align: middle; }
     .alpha-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
@@ -201,6 +214,8 @@
       background: var(--surface); border-radius: var(--radius-lg);
       padding: 20px 24px; box-shadow: var(--shadow-popup);
     }
+    .modal-close { position: absolute; top: 14px; right: 16px; color: rgba(0, 0, 0, 0.45); font-size: 16px; line-height: 1; }
+    .demo-card { max-width: 360px; background: var(--surface); border: 1px solid var(--outline-variant); border-radius: var(--radius-lg); padding: 24px; }
     .callout {
       background: var(--primary-bg); border-radius: var(--radius-lg); padding: 12px 16px; margin: 0 0 16px;
     }
@@ -210,8 +225,45 @@
     }
     ol.steps { padding-left: 20px; }
     ol.steps li { margin-bottom: 12px; }
+    .prototype { display: grid; grid-template-columns: 240px 1fr; border: 1px solid var(--outline); border-radius: var(--radius-lg); overflow: hidden; }
+    .prototype-menu { background: var(--surface); border-right: 1px solid var(--outline); padding: 8px 0; }
+    .prototype .menu { width: auto; border: 0; border-radius: 0; }
+    .scene-viewport { position: relative; background: var(--surface-layout); padding: 16px; min-height: 480px; }
+    .scene-page { background: var(--surface); border-radius: var(--radius-lg); padding: 24px; }
+    .scene-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+    .scene-title { font-size: 20px; line-height: 28px; font-weight: 600; }
+    .scene-toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+    .link-danger { color: var(--error); margin-left: 12px; }
+    .link-danger:hover { color: #FF7875; }
+    .empty { text-align: center; padding: 40px 0; color: var(--text-disabled); }
+    .empty-img { width: 72px; height: 48px; margin: 0 auto 8px; border: 2px solid var(--outline); border-radius: var(--radius); background: var(--surface-container); }
+    .spin-overlay { position: absolute; inset: 0; background: rgba(255, 255, 255, 0.65); display: none; place-items: center; z-index: 5; border-radius: var(--radius-lg); }
+    .spinner { width: 20px; height: 20px; border: 2px solid var(--primary-bg); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-danger { background: var(--error); color: #fff; border: 0; }
+    .btn-danger:hover { background: #FF7875; }
+    .overlay { position: fixed; inset: 0; z-index: 95; display: flex; align-items: center; justify-content: center; background: var(--mask); opacity: 0; pointer-events: none; transition: opacity 0.2s cubic-bezier(0.645, 0.045, 0.355, 1); }
+    .overlay.show { opacity: 1; pointer-events: auto; }
+    .dialog { width: 416px; max-width: calc(100vw - 32px); background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-popup); padding: 20px 24px; }
+    .toast { position: fixed; top: 8px; left: 50%; transform: translateX(-50%); z-index: 99; display: none; background: var(--surface); padding: 7px 16px; border-radius: var(--radius); box-shadow: var(--shadow-popup); gap: 8px; align-items: center; font-size: 14px; animation: toastIn 0.2s cubic-bezier(0.645, 0.045, 0.355, 1); }
+    @keyframes toastIn { from { opacity: 0; transform: translate(-50%, -8px); } }
+    .toast-icon { width: 14px; height: 14px; border-radius: var(--radius-full); background: var(--success); color: #fff; font-size: 9px; line-height: 14px; text-align: center; font-weight: 700; }
+    .drawer-mask { position: fixed; inset: 0; z-index: 90; background: var(--mask); opacity: 0; pointer-events: none; transition: opacity 0.3s cubic-bezier(0.645, 0.045, 0.355, 1); }
+    .drawer-mask.show { opacity: 1; pointer-events: auto; }
+    .drawer { position: fixed; top: 0; right: 0; bottom: 0; z-index: 91; width: 378px; max-width: 92vw; background: var(--surface); display: flex; flex-direction: column; box-shadow: -6px 0 16px -8px rgba(0, 0, 0, 0.08), -9px 0 28px 0 rgba(0, 0, 0, 0.05); transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1); }
+    .drawer.open { transform: none; }
+    .drawer-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid var(--outline-variant); font-size: 16px; line-height: 24px; font-weight: 600; }
+    .drawer-body { flex: 1; padding: 24px; overflow: auto; }
+    .drawer-footer { display: flex; justify-content: flex-end; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--outline-variant); }
+    .form-item { margin-bottom: 20px; }
+    .form-item label { display: block; margin-bottom: 8px; }
+    .form-item .input { width: 100%; }
+    .form-item.invalid .input { border-color: var(--error); }
+    .error-text { color: var(--error); font-size: 12px; line-height: 20px; margin-top: 4px; display: none; }
     @media (max-width: 800px) {
       .shell { grid-template-columns: 1fr; }
+      .prototype { grid-template-columns: 1fr; }
+      .prototype-menu { border-right: 0; border-bottom: 1px solid var(--outline); }
       nav { position: relative; height: auto; }
       .compare, .values, .alpha-row { grid-template-columns: 1fr; }
       .type-row { grid-template-columns: 1fr; gap: 4px; }
@@ -222,43 +274,39 @@
   <div class="shell">
     <nav>
       <p class="brand">PKUSE 设计规范</p>
-      <p class="meta">对照 ant-design-v6.md<br />Ant Design v6 默认浅色主题</p>
       <a href="#overview">概述</a>
       <a href="#values">价值观</a>
       <a href="#colors">色彩</a>
       <a href="#type">字体</a>
       <a href="#layout">布局</a>
-      <a href="#elevation">海拔与动效</a>
+      <a href="#elevation">层级与深度</a>
       <a href="#shapes">形状</a>
-      <a href="#choose">组件选用</a>
       <a href="#components">组件外观</a>
+      <a href="#scenes">场景原型</a>
       <a href="#rules">对与错</a>
       <a href="#customize">定制</a>
     </nav>
     <main>
-      <h1>即时预览</h1>
-      <p class="lead">视觉对照 <code>references/ant-design-v6.md</code>（来源 <a href="https://ant.design/design.md">ant.design/design.md</a>）。组件何时使用见下方选用表，完整说明在 <a href="../../.cursor/skills/pkuse-design-generator/references/components/INDEX.md">components/INDEX.md</a>。第一版视觉基线是 Ant Design 默认蓝，不是绿色品牌皮肤。</p>
-
       <h2 id="overview">概述</h2>
       <div class="card">
-        <p>本文描述 <strong>Ant Design v6</strong> 默认浅色主题。系统遵循语义化版本：大版本（v5 → v6）表示设计语言重构，小版本与补丁版本保持本文稳定。主版本内的 Token 漂移见 CHANGELOG。</p>
-        <p>Ant Design 是蚂蚁集团用于交付企业软件的开源设计系统，主要面向中后台控制台、看板和运营工具。2015 年创建，目的是给大型产品团队一套有主张的共同基础，使密集、数据丰富的界面不必在每个屏幕上重新决定基础规则。</p>
+        <p><strong>Pkuse Design</strong> 是<strong>北大软件产品研发部</strong>的产品设计系统，基于 <strong>Ant Design v6</strong> 构建，作为部门产品的视觉与交互基线，主要面向中后台管理系统、看板和运营工具。</p>
+        <p>Pkuse Design 以 Token 驱动：色彩、字体、间距、形状、层级与深度均对齐 Ant Design v6 默认浅色主题，第一版直接采用默认蓝 <code>#1677FF</code>，不另造品牌色。本页用于即时预览与对照，各产品落地时以 Pkuse Design 为准。</p>
       </div>
 
       <h2 id="values">价值观</h2>
       <p class="lead">四个价值观指导系统中的每一个决策。</p>
       <div class="values">
-        <div class="value-card"><strong>Natural</strong><p>界面遵循既有惯例，不让回头用户感到意外。优先采用操作系统和前代企业软件中已存在的模式，而不是发明新交互。</p></div>
-        <div class="value-card"><strong>Certain</strong><p>用户始终知道自己处于什么状态、输入产生了什么结果、下一步是什么。悬停、焦点、加载和错误状态明确且一致。</p></div>
-        <div class="value-card"><strong>Meaningful</strong><p>视觉强调只留给行动。不传达信息的装饰一律去掉。</p></div>
-        <div class="value-card"><strong>Growing</strong><p>系统可以从小表单扩到密表格、再扩到多租户管理控制台，而不失去一致性。</p></div>
+        <div class="value-card"><strong>自然</strong><p>界面遵循既有惯例，不让回头用户感到意外。优先采用操作系统和前代企业软件中已存在的模式，而不是发明新交互。</p></div>
+        <div class="value-card"><strong>确定性</strong><p>用户始终知道自己处于什么状态、输入产生了什么结果、下一步是什么。悬停、焦点、加载和错误状态明确且一致。</p></div>
+        <div class="value-card"><strong>意义感</strong><p>视觉强调只留给行动。不传达信息的装饰一律去掉。</p></div>
+        <div class="value-card"><strong>生长性</strong><p>系统可以从小表单扩到密表格、再扩到多租户管理控制台，而不失去一致性。</p></div>
       </div>
 
       <h2 id="colors">色彩</h2>
       <div class="card">
         <p>色板由一个<strong>主色</strong>种子、四个语义状态种子（<code>success</code> / <code>warning</code> / <code>error</code> / <code>info</code>）以及文字与表面的中性色构成。种子经 <code>@ant-design/colors</code> 自动展开为背景浅色、悬停、按下和描边阶梯——改种子，整套派生色一起移动。</p>
         <p><code>#1677FF</code> 被选为主色，因为蓝色读起来可信、专注，既没有更深海军蓝的刻板，也没有高饱和青色的俏皮。它是操作、链接、焦点环、选中导航和激活 Tab 的默认品牌色。</p>
-        <div class="callout">无障碍说明：本文记录的是默认视觉 Token。部分品牌色组合（尤其是白字配 <code>#1677FF</code>，以及主文字配浅选中底）低于 WCAG AA 小字 4.5:1。若需严格无障碍，通过 ConfigProvider 加深 <code>colorPrimary</code>，或做组件级覆盖，不要发明一次性颜色。</div>
+        <div class="callout">无障碍说明：本文记录的是 Ant Design 的默认视觉 Token。部分品牌色组合（尤其是白字配 <code>#1677FF</code>，以及主文字配浅选中底）低于 WCAG AA 小字 4.5:1 对比度阈值。若需严格无障碍，通过 ConfigProvider 加深 <code>colorPrimary</code>，或做组件级 Token 覆盖，不要发明一次性颜色。</div>
 
         <h3>品牌与语义</h3>
         <div class="swatches">
@@ -364,9 +412,9 @@
         </div>
       </div>
 
-      <h2 id="elevation">海拔与动效</h2>
+      <h2 id="elevation">层级与深度</h2>
       <div class="card">
-        <p>Ant Design 是 <strong>flat-first</strong>。层级由边框和色调对比承担。阴影只出现在真正浮于上下文之上的表面。</p>
+        <p>Pkuse Design 采用 <strong>flat-first（扁平优先）</strong>。层级由边框和色调对比承担。阴影只出现在真正浮于上下文之上的表面。</p>
         <p>阴影 Token 由 <code>colorShadow</code> 生成，同一名称可适应浅色/深色。核心档位：</p>
         <div class="space-row" style="align-items:stretch;margin-bottom:16px">
           <div class="shadow-box shadow-tertiary" style="flex:1">
@@ -416,67 +464,8 @@
         <p class="note">相邻元素混用圆角是坏味道：8px 卡片里不该放 16px 圆角按钮。</p>
       </div>
 
-      <h2 id="choose">组件选用</h2>
-      <div class="card">
-        <p class="lead">后台常用对照。实现时打开对应的 <code>references/components/&lt;name&gt;.md</code>，不要整份阅读官网全文快照，也不要把本页做成 72 个组件展览。</p>
-        <table class="choose">
-          <thead>
-            <tr><th>场景</th><th>用这个</th><th>不要用这个</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>主操作 / 次操作 / 危险操作</td>
-              <td>主按钮只留一个。次操作用 default / text / link。删除用 <code>danger</code> + Popconfirm。</td>
-              <td>同一决策面两个 primary。用绿色实心按钮当主操作。</td>
-            </tr>
-            <tr>
-              <td>结构化列表、排序、分页、批量</td>
-              <td><code>Table</code></td>
-              <td>用卡片宫格替代主表。用 <code>List</code> 承载八列密数据。</td>
-            </tr>
-            <tr>
-              <td>短队列、意见流、排行</td>
-              <td><code>List</code>；审批队列也可用 Table。</td>
-              <td>为排行再复制一张完整 CRUD 表。</td>
-            </tr>
-            <tr>
-              <td>只读对象摘要</td>
-              <td><code>Descriptions</code></td>
-              <td>用禁用表单冒充详情。</td>
-            </tr>
-            <tr>
-              <td>列表上新增 / 编辑</td>
-              <td>短表单用 <code>Drawer</code> 或 <code>Modal</code>。</td>
-              <td>默认再拆 <code>/new</code> 路由。表单很短却用独立页。</td>
-            </tr>
-            <tr>
-              <td>打断工作流的确认 / 决策</td>
-              <td><code>Modal</code>；驳回强制填意见。</td>
-              <td>通过 / 驳回不确认。用 Drawer 做只有两句话的确认。</td>
-            </tr>
-            <tr>
-              <td>分类、非关键状态</td>
-              <td><code>Tag</code> 或带文字的 <code>Badge</code></td>
-              <td>用 Tag 表示关键失败。圆点代替必读文字。</td>
-            </tr>
-            <tr>
-              <td>页级成功 / 警告 / 错误说明</td>
-              <td><code>Alert</code></td>
-              <td>把整页做成成功绿。用彩色正文代替图标 + 浅底。</td>
-            </tr>
-            <tr>
-              <td>加载 / 空 / 无权限 / 失败</td>
-              <td>加载 <code>Spin</code>，空 <code>Empty</code>（保留查询区），401/403/404/5xx 用不同 <code>Result</code>。</td>
-              <td>绿色骨架屏。401 和 403 收成同一句。</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
       <h2 id="components">组件外观</h2>
       <div class="card">
-        <p class="lead">下列原型对应 YAML front-matter 中的 Token 引用。</p>
-
         <h3>Button · primary</h3>
         <p class="note">每个屏幕唯一的主导操作。实心主色、白字、32px 高、6px 圆角。悬停变 <code>#4096FF</code>，按下变 <code>#0958D9</code>。同一决策面不要叠两个主按钮。</p>
         <div class="btn-row">
@@ -492,19 +481,20 @@
         <p class="note">32px 高，与按钮对齐。细 1px 描边；焦点加粗主色边并带内发光。占位符用 <code>on-surface-disabled</code>。Select 在交互前看起来像 Input。</p>
         <div class="form-row">
           <input class="input" placeholder="请输入关键词" />
-          <select class="input" style="width:160px;padding:0 11px"><option>全部仓库</option><option>华东仓</option></select>
+          <select class="input" style="width:160px"><option>全部仓库</option><option>华东仓</option></select>
         </div>
 
         <h3>Card</h3>
         <p class="note">工作马容器。白表面、8px 圆角、可选 <code>boxShadowCard</code>。内边距四边 24px；嵌套控件保持 16px 间隙。</p>
-        <div class="layer-container shadow-tertiary" style="max-width:360px">卡片内容区，内边距 24px。</div>
+        <div class="demo-card">卡片内容区，内边距 24px。</div>
 
         <h3>Modal</h3>
         <p class="note">与 Card 同表面和圆角，但用次级阴影，居中叠在 <code>rgba(0,0,0,0.45)</code> 遮罩上。主体 padding 上下 20px、左右 24px。</p>
         <div class="modal-stage">
           <div class="modal-mask"></div>
           <div class="modal-panel">
-            <h4 style="margin-top:0">确认提交</h4>
+            <span class="modal-close">×</span>
+            <h4 style="margin-top:0;font-size:16px;line-height:24px">确认提交</h4>
             <p class="note">对话框示范：elevated 表面 + popup 阴影 + 45% 遮罩。</p>
             <div class="btn-row">
               <button class="btn-primary" type="button">确定</button>
@@ -519,6 +509,20 @@
           <div class="menu-item selected">库存查询</div>
           <div class="menu-item">出入库</div>
           <div class="menu-item">盘点任务</div>
+        </div>
+
+        <h3>Menu · 场景菜单（多级）</h3>
+        <p class="note">内联多级菜单：父级子菜单可展开收起（箭头旋转 0.2s），子项按层级缩进 24px；选中项 <code>#E6F4FF</code> 底 + 主色文字。</p>
+        <div class="menu">
+          <details class="menu-sub" open>
+            <summary class="menu-item menu-sub-title">场景菜单<span class="menu-arrow">▾</span></summary>
+            <div class="menu-sub-children">
+              <div class="menu-item selected">用户管理</div>
+              <div class="menu-item">当面登记</div>
+              <div class="menu-item">场景三</div>
+            </div>
+          </details>
+          <div class="menu-item">全局设置</div>
         </div>
 
         <h3>Tabs · 激活项</h3>
@@ -549,10 +553,10 @@
 
         <h3>Alert</h3>
         <p class="note">语义反馈表面。成功/警告/错误/信息用浅语义底 + 正常文字色；状态由图标和底色传达，不用低对比的彩色正文。</p>
-        <div class="alert alert-success">成功：只用 success 绿提示结果，不要把整页做成绿色。</div>
-        <div class="alert alert-warning">警告：空数据用 Empty，保留查询区。</div>
-        <div class="alert alert-error">错误：用 Result；401 和 403 分开。</div>
-        <div class="alert alert-info">信息：加载中用 Spin，不要换一套绿色骨架屏。</div>
+        <div class="alert alert-success"><span class="alert-icon" style="background:#52C41A">✓</span>成功：只用 success 绿提示结果，不要把整页做成绿色。</div>
+        <div class="alert alert-warning"><span class="alert-icon" style="background:#FAAD14">!</span>警告：空数据用 Empty，保留查询区。</div>
+        <div class="alert alert-error"><span class="alert-icon" style="background:#FF4D4F">×</span>错误：用 Result；401 和 403 分开。</div>
+        <div class="alert alert-info"><span class="alert-icon" style="background:#1677FF">i</span>信息：加载中用 Spin，不要换一套绿色骨架屏。</div>
 
         <h3>Badge status</h3>
         <p class="note">紧凑状态点。危急可用 error 填充，但在无障碍关键流程里圆点不能代替文字。</p>
@@ -568,6 +572,71 @@
           <div class="dropdown-item">编辑</div>
           <div class="dropdown-item">导出</div>
           <div class="dropdown-item">删除</div>
+        </div>
+      </div>
+
+      <h2 id="scenes">场景原型</h2>
+      <div class="card">
+        <p class="lead">按 Pkuse Design 交互基线组装的可交互原型：点击左侧场景菜单切换场景，右侧为完整后台界面——搜索、表格、新增/编辑抽屉、删除确认与加载/空态。落地实现以 skill 生成的真实应用为准。</p>
+        <div class="prototype">
+          <div class="prototype-menu">
+            <div class="menu">
+              <details class="menu-sub" open>
+                <summary class="menu-item menu-sub-title">场景菜单<span class="menu-arrow">▾</span></summary>
+                <div class="menu-sub-children">
+                  <div class="menu-item selected" data-scene="user">用户管理</div>
+                  <div class="menu-item" data-scene="register">当面登记</div>
+                </div>
+              </details>
+            </div>
+          </div>
+          <div class="scene-viewport">
+            <div class="scene-page" id="scene-user">
+              <div class="scene-head">
+                <div>
+                  <div class="scene-title">用户管理</div>
+                  <div class="note">维护系统账号、角色与启用状态。</div>
+                </div>
+                <button class="btn-primary" type="button" onclick="openDrawer()">新增用户</button>
+              </div>
+              <div class="scene-toolbar">
+                <input class="input" id="searchName" placeholder="请输入姓名" style="width:180px" oninput="renderUsers()" />
+                <select class="input" id="searchStatus" style="width:120px" onchange="renderUsers()">
+                  <option value="">全部状态</option>
+                  <option>启用</option>
+                  <option>禁用</option>
+                </select>
+                <button class="btn-primary" type="button" onclick="renderUsers()">查 询</button>
+                <button class="btn-default" type="button" onclick="resetSearch()">重 置</button>
+              </div>
+              <div style="position:relative">
+                <table id="userTable">
+                  <thead>
+                    <tr><th>姓名</th><th>角色</th><th>状态</th><th>创建时间</th><th style="width:130px">操作</th></tr>
+                  </thead>
+                  <tbody id="userRows"></tbody>
+                </table>
+                <div class="empty" id="userEmpty" style="display:none">
+                  <div class="empty-img"></div>
+                  暂无数据
+                </div>
+                <div class="spin-overlay" id="userSpin"><div class="spinner"></div></div>
+              </div>
+            </div>
+            <div class="scene-page" id="scene-register" style="display:none">
+              <div class="scene-head">
+                <div>
+                  <div class="scene-title">当面登记</div>
+                  <div class="note">现场登记来访人员信息并签发临时凭证。</div>
+                </div>
+                <button class="btn-primary" type="button" onclick="showToast('当面登记场景原型构建中')">发起登记</button>
+              </div>
+              <div class="empty">
+                <div class="empty-img"></div>
+                该场景原型构建中，敬请期待
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -590,10 +659,6 @@
           <p>不要在产品代码里用魔法数字。刻度缺一档时，该重看设计，而不是一像素覆盖。</p>
         </div>
       </div>
-      <div class="card">
-        <p class="lead">PKUSE 叠加：不要用 <code>#12372a</code> / <code>#176b4d</code> 做顶栏或品牌块，也不要把页面底改成 <code>#f2f5f2</code> 这类绿灰。成功绿只出现在 Tag、Alert、状态点。</p>
-      </div>
-
       <h2 id="customize">定制</h2>
       <div class="card">
         <p>YAML 中的每个值都是 <code>defaultAlgorithm</code> 产出的<strong>默认值</strong>——浅色主题。Ant Design 主题化比替换 Design Token 更广：包含算法派生、组件级覆盖、动态切换、嵌套主题作用域、CSS 变量输出、静态 Token 消费，以及零运行时 CSS 提取。完整运行时 API 见 <a href="https://ant.design/docs/react/customize-theme">Customize Theme</a>。</p>
@@ -606,18 +671,168 @@
           <li><strong>Token 消费与输出。</strong>React 内用 <code>theme.useToken()</code>，React 外用 <code>theme.getDesignToken()</code>。需要 CSS 变量时用 <code>theme.cssVar</code>；必须关闭运行时样式生成时用 <code>theme.zeroRuntime</code> 配合预构建或提取的 CSS。</li>
         </ol>
         <p>自定义主题时，先保住 Ant Design 的交互结构、密度、状态反馈和组件语义，再改最小必要种子集：通常是 <code>colorPrimary</code>、状态色、<code>borderRadius</code>、<code>fontFamily</code>、<code>fontSize</code> 和中性表面基色。品牌页可以看起来不同，但表单、表格、导航、浮层、焦点态和校验反馈仍应像 Ant Design。避免生成绕过 Token、算法、<code>theme.components</code>、CSS 变量或提取静态样式的自定义 CSS；若主题无法通过这些官方层表达，应视为设计系统扩展，而不是页面一次性样式。</p>
-        <p class="note">PKUSE 第一版：不改品牌种子。生成应用通过 ConfigProvider 锁定默认主色 <code>#1677FF</code>，并用应用级 <code>prefixCls</code> 与 CSS Variable key。</p>
-<pre>theme.token = {
-  colorPrimary: '#1677FF',
-  colorSuccess: '#52C41A',
-  colorWarning: '#FAAD14',
-  colorError: '#FF4D4F',
-  colorInfo: '#1677FF',
-  fontSize: 14,
-  borderRadius: 6,
-}</pre>
       </div>
     </main>
   </div>
+  <div class="drawer-mask" id="drawerMask" onclick="closeDrawer()"></div>
+  <div class="drawer" id="userDrawer">
+    <div class="drawer-header">
+      <span id="drawerTitle">新增用户</span>
+      <span class="modal-close" style="position:static" onclick="closeDrawer()">×</span>
+    </div>
+    <div class="drawer-body">
+      <div class="form-item" id="itemName">
+        <label>姓名</label>
+        <input class="input" id="fieldName" placeholder="请输入姓名" />
+        <div class="error-text" id="nameError">请输入姓名</div>
+      </div>
+      <div class="form-item">
+        <label>角色</label>
+        <select class="input" id="fieldRole">
+          <option>管理员</option>
+          <option>运营</option>
+          <option>审计</option>
+        </select>
+      </div>
+      <div class="form-item">
+        <label>状态</label>
+        <select class="input" id="fieldStatus">
+          <option>启用</option>
+          <option>禁用</option>
+        </select>
+      </div>
+    </div>
+    <div class="drawer-footer">
+      <button class="btn-default" type="button" onclick="closeDrawer()">取 消</button>
+      <button class="btn-primary" type="button" onclick="submitDrawer()">确 定</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="confirmModal">
+    <div class="dialog">
+      <h4 style="margin:0 0 8px;font-size:16px;line-height:24px">删除确认</h4>
+      <p class="note" id="confirmText" style="margin:0 0 16px">确定删除该用户吗？</p>
+      <div style="display:flex;justify-content:flex-end;gap:8px">
+        <button class="btn-default" type="button" onclick="hideConfirm()">取 消</button>
+        <button class="btn-danger" type="button" onclick="doDelete()">删 除</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"><span class="toast-icon">✓</span><span id="toastText"></span></div>
+
+  <script>
+    var users = [
+      { name: '张伟', role: '管理员', status: '启用', created: '2026-08-02 10:24' },
+      { name: '李娜', role: '运营', status: '启用', created: '2026-08-11 14:03' },
+      { name: '王强', role: '审计', status: '禁用', created: '2026-08-19 09:47' },
+      { name: '刘敏', role: '运营', status: '启用', created: '2026-09-01 16:30' },
+      { name: '陈静', role: '管理员', status: '禁用', created: '2026-09-12 11:18' }
+    ];
+    var editIndex = -1, deleteIndex = -1, toastTimer = null;
+
+    function $(id) { return document.getElementById(id); }
+    function fmt(d) {
+      function p(n) { return (n < 10 ? '0' : '') + n; }
+      return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+    }
+
+    function renderUsers() {
+      var kw = $('searchName').value.trim();
+      var st = $('searchStatus').value;
+      var rows = users
+        .map(function (u, i) { return { u: u, i: i }; })
+        .filter(function (r) { return (!kw || r.u.name.indexOf(kw) > -1) && (!st || r.u.status === st); });
+      $('userRows').innerHTML = rows.map(function (r) {
+        return '<tr><td>' + r.u.name + '</td><td>' + r.u.role + '</td><td><span class="tag ' +
+          (r.u.status === '启用' ? 'tag-green' : '') + '">' + r.u.status + '</span></td><td class="mono">' +
+          r.u.created + '</td><td><a href="javascript:void(0)" onclick="openDrawer(' + r.i + ')">编辑</a>' +
+          '<a class="link-danger" href="javascript:void(0)" onclick="askDelete(' + r.i + ')">删除</a></td></tr>';
+      }).join('');
+      var empty = rows.length === 0;
+      $('userEmpty').style.display = empty ? 'block' : 'none';
+      $('userTable').style.display = empty ? 'none' : '';
+    }
+
+    function resetSearch() {
+      $('searchName').value = '';
+      $('searchStatus').value = '';
+      renderUsers();
+    }
+
+    function switchScene(scene) {
+      document.querySelectorAll('[data-scene]').forEach(function (el) {
+        el.classList.toggle('selected', el.dataset.scene === scene);
+      });
+      $('scene-user').style.display = scene === 'user' ? '' : 'none';
+      $('scene-register').style.display = scene === 'register' ? '' : 'none';
+      var spin = $('userSpin');
+      spin.style.display = 'grid';
+      setTimeout(function () { spin.style.display = 'none'; }, 500);
+    }
+    document.querySelectorAll('[data-scene]').forEach(function (el) {
+      el.addEventListener('click', function () { switchScene(el.dataset.scene); });
+    });
+
+    function openDrawer(i) {
+      editIndex = typeof i === 'number' ? i : -1;
+      $('drawerTitle').textContent = editIndex > -1 ? '编辑用户' : '新增用户';
+      var u = editIndex > -1 ? users[editIndex] : { name: '', role: '运营', status: '启用' };
+      $('fieldName').value = u.name;
+      $('fieldRole').value = u.role;
+      $('fieldStatus').value = u.status;
+      $('itemName').classList.remove('invalid');
+      $('nameError').style.display = 'none';
+      $('drawerMask').classList.add('show');
+      $('userDrawer').classList.add('open');
+    }
+    function closeDrawer() {
+      $('drawerMask').classList.remove('show');
+      $('userDrawer').classList.remove('open');
+    }
+    function submitDrawer() {
+      var name = $('fieldName').value.trim();
+      if (!name) {
+        $('itemName').classList.add('invalid');
+        $('nameError').style.display = 'block';
+        return;
+      }
+      var u = { name: name, role: $('fieldRole').value, status: $('fieldStatus').value, created: fmt(new Date()) };
+      if (editIndex > -1) {
+        u.created = users[editIndex].created;
+        users[editIndex] = u;
+        showToast('用户已更新');
+      } else {
+        users.unshift(u);
+        showToast('用户创建成功');
+      }
+      closeDrawer();
+      renderUsers();
+    }
+
+    function askDelete(i) {
+      deleteIndex = i;
+      $('confirmText').textContent = '确定删除用户「' + users[i].name + '」吗？删除后不可恢复。';
+      $('confirmModal').classList.add('show');
+    }
+    function hideConfirm() { $('confirmModal').classList.remove('show'); }
+    function doDelete() {
+      var name = users[deleteIndex].name;
+      users.splice(deleteIndex, 1);
+      hideConfirm();
+      renderUsers();
+      showToast('已删除「' + name + '」');
+    }
+
+    function showToast(text) {
+      var t = $('toast');
+      $('toastText').textContent = text;
+      t.style.display = 'flex';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { t.style.display = 'none'; }, 2000);
+    }
+
+    renderUsers();
+  </script>
 </body>
 </html>
