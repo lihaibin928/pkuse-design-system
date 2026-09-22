@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>图标 · Pkuse Design 设计规范</title>
+  <link rel="stylesheet" href="assets/theme.css?v=2" />
+</head>
+<body data-page="icons">
+  <div class="shell">
+    <nav id="site-nav"></nav>
+    <main>
+<h2 id="icons">图标</h2>
+      <p class="lead">统一使用 <code>@ant-design/icons</code> 6.x，与 antd 同源，风格、线宽与网格一致。图标是界面的辅助语言，不单独承载语义。</p>
+
+      <div class="card">
+        <h3 style="margin-top:0">尺寸阶梯</h3>
+        <p class="note" style="margin:0 0 16px">按使用场景选择固定尺寸，不随意缩放。</p>
+        <div id="icon-size-demo" class="icon-size-row"></div>
+
+        <h3>颜色规则</h3>
+        <p class="note" style="margin:0 0 16px">默认继承文字颜色（<code>currentColor</code>）；语义色只跟随状态语义；主色只用于主操作与选中态。</p>
+        <div id="icon-color-demo" class="icon-color-row"></div>
+
+        <h3>使用规范</h3>
+        <ul>
+          <li>默认使用线性图标（<code>Outlined</code>）；填充图标（<code>Filled</code>）只用于状态强调，如成功/警告/错误的圆形反馈图标。</li>
+          <li>仅图标按钮必须配 <code>Tooltip</code> 说明功能；图标旁有文字时不重复描述。</li>
+          <li>同一语义在整个产品中固定使用同一图标（如“删除”始终为 <code>DeleteOutlined</code>），不因页面而变。</li>
+          <li>不引入多色图标与手绘图标；缺图标时优先复用现有图标语义，再考虑补充。</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top:0">图标清单</h3>
+        <p class="note" style="margin:0 0 16px">后台常用图标（来自 <code>@ant-design/icons</code> 6.x 实际渲染）。按分类筛选或搜索，完整组件名即网格中的名称。</p>
+        <div id="icon-gallery">正在加载图标库（本地依赖，约数秒）…</div>
+      </div>
+    </main>
+  </div>
+  <script src="assets/layout.js?v=2"></script>
+  <script src="vendor/protable.js?v=2"></script>
+</body>
+</html>

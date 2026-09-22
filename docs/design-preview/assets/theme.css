@@ -245,7 +245,7 @@
       .compare, .values, .alpha-row { grid-template-columns: 1fr; }
       .type-row { grid-template-columns: 1fr; gap: 4px; }
     }
-.nav-group { padding: 8px 12px 4px; margin: 8px 0 0; color: var(--text-secondary); font-size: 12px; line-height: 20px; }
+.nav-group { padding: 8px 12px; margin: 0 0 4px; color: var(--text); font-size: 14px; line-height: 22px; border-radius: var(--radius); }
 a.nav-child { padding-left: 28px; }
 .ant-pro-table .ant-table-thead > tr > th { text-align: center; }
 #protable-simple-mount .ant-pro-card-body { padding: 0 24px 16px !important; }
@@ -298,3 +298,19 @@ a.nav-child { padding-left: 28px; }
 .date-cell.other { color: var(--text-disabled); }
 .date-cell.today { border: 1px solid var(--primary); color: var(--primary); }
 .date-cell.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
+.icon-filter-row { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+.icon-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+.icon-tab { border: 0; background: none; cursor: pointer; font: inherit; color: var(--text-secondary); padding: 4px 12px; border-radius: var(--radius); }
+.icon-tab:hover { color: var(--primary); background: var(--primary-bg); }
+.icon-tab.active { color: var(--primary); background: var(--primary-bg); font-weight: 600; }
+.icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
+.icon-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 16px 8px; border: 1px solid var(--outline-variant); border-radius: var(--radius); background: var(--surface); transition: color 0.2s, border-color 0.2s; }
+.icon-cell:hover { border-color: var(--primary); color: var(--primary); }
+.icon-cell-glyph { font-size: 24px; display: inline-flex; }
+.icon-cell-name { font-size: 12px; line-height: 16px; color: var(--text-secondary); word-break: break-all; text-align: center; }
+.icon-cell:hover .icon-cell-name { color: var(--primary); }
+.icon-size-row { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 16px; }
+.icon-size-item { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 13px; }
+.icon-color-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; font-size: 13px; }
+.nav-subgroup { padding: 8px 12px 2px 28px; margin: 0; color: var(--text-secondary); font-size: 13px; line-height: 20px; }
+a.nav-child-deep { padding-left: 44px; }

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>布局 · Pkuse Design 设计规范</title>
+  <link rel="stylesheet" href="assets/theme.css?v=2" />
+</head>
+<body style="padding:0;background:var(--surface-layout)">
+  <main style="padding:24px;max-width:none">
+    <h2 id="app-layout" style="margin-top:0">布局</h2>
+    <p class="lead">后台应用的整体框架由 <code>ProLayout</code> 承载（形态对齐 ProComponents 官方基础示例）：左侧导航承载功能模块与多级菜单，顶栏承载品牌、通知与用户信息，内容区由页面组成。以下为真实组件渲染，可点击左侧菜单切换。</p>
+
+    <div class="card">
+      <div id="prolayout-demo">正在加载 ProLayout 组件（本地依赖，约数秒）…</div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">结构规范</h3>
+      <ul>
+        <li><strong>侧栏导航</strong>：宽度 208px，可折叠至 48px；承载全部功能模块，支持两级菜单；选中项使用 <code>#E6F4FF</code> 浅底 + 主色文字。</li>
+        <li><strong>顶栏</strong>：高度 56px，左侧为品牌与面包屑，右侧为通知、帮助与用户信息；与内容区以边框分隔（层级来自描边而非阴影）。</li>
+        <li><strong>内容区</strong>：底色为 <code>surface-layout #F5F5F5</code>，页面内容以 <code>bg-container #FFFFFF</code> 卡片承载，内边距 24px。</li>
+        <li><strong>qiankun 子应用</strong>：布局由主应用提供时，子应用只注册路由与页面，不重复实现侧栏与顶栏。</li>
+      </ul>
+    </div>
+  </main>
+  <script src="vendor/protable.js?v=2"></script>
+</body>
+</html>
