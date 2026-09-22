@@ -18,7 +18,7 @@
 
 ## PKUSE
 
-- 视觉与 Token 遵循 `references/design-system.md` 和 `references/ant-design-v6.zh.md`。
+- 视觉与 Token 遵循 `references/DESIGN.md`。
 - 短流程用 `Modal`；表单超出抽屉容量才用独立页。
 - 同一决策面不要并排两个主按钮。
 - 需要改外观时使用下面的语义槽 `classNames` / `styles`，不要写无前缀的 `.ant-*` 选择器。

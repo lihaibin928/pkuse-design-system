@@ -31,7 +31,7 @@
 
 ## PKUSE
 
-- 视觉与 Token 遵循 `references/design-system.md` 和 `references/ant-design-v6.zh.md`。
+- 视觉与 Token 遵循 `references/DESIGN.md`。
 - 同一个决策面只保留一个主按钮，其余降为 default / link / text。
 - 危险操作用 `danger`，并配合 `Popconfirm` 或确认对话框。
 - 需要改外观时使用下面的语义槽 `classNames` / `styles`，不要写无前缀的 `.ant-*` 选择器。

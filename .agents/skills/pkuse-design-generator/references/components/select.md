@@ -18,7 +18,7 @@
 
 ## PKUSE
 
-- 视觉与 Token 遵循 `references/design-system.md` 和 `references/ant-design-v6.zh.md`。
+- 视觉与 Token 遵循 `references/DESIGN.md`。
 - 触发器在交互前应看起来像 Input，高度与按钮对齐。
 - 需要改外观时使用下面的语义槽 `classNames` / `styles`，不要写无前缀的 `.ant-*` 选择器。
 

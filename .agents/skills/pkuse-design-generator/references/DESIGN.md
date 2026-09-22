@@ -210,7 +210,40 @@ components:
     padding: 0 7px
 ---
 
-## 概述
+# Pkuse Design 设计规范
+
+本文件是 Pkuse Design 的设计系统规范文件，由两部分组成：「Pkuse 生成规则」为部门叠加约定，「Ant Design v6 基线规范」为视觉与交互基线全文（含上方 front-matter 中的全部 Design Token）。冲突时以下方基线为准，叠加规则不得与之矛盾。
+
+即时预览：打开 `docs/design-preview/index.html`，视觉对照本文件基线部分；组件选用看 [components/INDEX.md](components/INDEX.md)。生成的子应用独立运行后，打开 `/design-system`。
+
+## Pkuse 生成规则
+
+以已捕获的 Ant Design v6 规范（[英文原版](ant-design-v6.md)，中文全文已并入本文件「Ant Design v6 基线规范」）作为视觉与交互基线。第一版直接采用 Ant Design 默认主题，不另造品牌色。
+
+组件选用看 [components/INDEX.md](components/INDEX.md)，实现某个组件时只打开对应的 `components/<name>.md`。`antd/llms-full-cn.txt` 与 `antd/llms-semantic-cn.md` 是官网全文快照，默认不要整份阅读。
+
+即时预览：打开 `docs/design-preview/index.html`，视觉对照 `ant-design-v6.md`，并含后台常用组件选用表。生成的子应用独立运行后，打开 `/design-system`。
+
+### 色彩
+
+- 品牌主色固定为 Ant Design 默认蓝 `#1677FF`（`colorPrimary`）。按钮、链接、焦点环、选中导航、激活 Tab 都用主色。
+- `#52C41A` 是 `colorSuccess`，只表示成功/正常状态，不能当品牌色、顶栏、侧栏、页面底色或主按钮。
+- 不要使用墨绿、森林绿、青绿色皮肤（例如 `#12372a`、`#176b4d`、`#f2f5f2` 这类自定义绿色壳层）。
+- 分类用预设色，状态用语义色（success / warning / error / info），主操作才用主色。
+- 使用 `ConfigProvider` 的 Token；不要硬编码颜色，也不要硬编码可用 Token 表达的间距。
+
+### 必守规则
+
+- 冲突时以 Natural、Certain、Meaningful、Growing 作为决策准则。
+- 间距对齐 4px 网格，采用默认 14px 企业后台密度。
+- 同一个决策面上只保留一个主按钮。
+- 表格、表单、导航、浮层和反馈优先使用 Ant Design 组件，不要先造自定义等价物。
+- 必须覆盖 hover、focus、loading、empty、error、disabled 和无权限状态。
+- 自定义 CSS 使用应用命名空间，并配置应用级 `prefixCls` 与 CSS Variable key。
+
+## Ant Design v6 基线规范
+
+### 概述
 
 本文描述 **Ant Design v6** 的默认浅色主题。系统遵循语义化版本：大版本（v5 → v6）表示设计语言重构，小版本与补丁版本保持本文稳定。主版本内每次发布的 Token 漂移见 [CHANGELOG.en-US.md](https://github.com/ant-design/ant-design/blob/master/CHANGELOG.en-US.md)。
 
@@ -223,7 +256,7 @@ Ant Design 是蚂蚁集团用于交付企业软件的开源设计系统，主要
 - **Meaningful（有意义）。** 视觉强调只留给行动。不传达信息的装饰一律去掉。
 - **Growing（生长）。** 系统可以从小表单扩到密表格、再扩到多租户管理控制台，而不失去一致性。
 
-## 色彩
+### 色彩
 
 色板由一个 **primary** 品牌种子、四个语义状态种子（`success`、`warning`、`error`、`info`），以及文字与表面的中性基色构成。种子经 `@ant-design/colors` 自动展开为背景浅色、悬停、按下和描边阶梯——改种子，整套派生色一起移动。
 
@@ -235,7 +268,7 @@ Ant Design 是蚂蚁集团用于交付企业软件的开源设计系统，主要
 
 预设色（`blue`、`purple`、`cyan`、`green`、`magenta`、`red`、`orange`、`yellow`、`volcano`、`geekblue`、`gold`、`lime`；运行时 Token 中 `pink` 是 `magenta` 的已弃用别名）只留给标签、图表和分类可视化——绝不用于主界面可操作元素。状态用功能色（`success` / `warning` / `error` / `info`），每个屏幕上最重要的那个操作才用 `primary`。
 
-## 字体
+### 字体
 
 基础字号是 **14px**，不是 16。企业控制台用信息密度换取额外易读空间——1440px 宽的窗口需要同时舒服地放下侧栏、顶栏、八列表格和详情区。14px 正文在这些栏宽下接近约 75 字符的扫视甜点。
 
@@ -243,7 +276,7 @@ Ant Design 是蚂蚁集团用于交付企业软件的开源设计系统，主要
 
 产品界面只用 **两个字重**：400（正文、控件、菜单项、Tab 标签）和 600（`fontWeightStrong` —— 标题、表头，以及任何 title 级文字）。细体（100–300）、粗体（700+）和斜体不用于界面骨架——它们会破坏系统追求的平静、确定语气。斜体只允许出现在长文本文档里。选中 / 激活态的视觉强调来自颜色和描边（边框、下划线），不是字重。
 
-## 布局
+### 布局
 
 所有间距对齐 **4px 网格**。六档间距刻度（`unit`、`xs`、`sm`、`md`、`lg`、`xl` → 4 / 4 / 8 / 16 / 24 / 32px）覆盖系统中每一个间隙、槽和内边距。Token 驱动的代码里不出现魔法数字——`padding: 11px`、`gap: 13px`；输入框水平 11px 内边距之所以存在，只因为设计早于 4px 网格，一像素迁移会牵动海量已有屏幕。
 
@@ -255,7 +288,7 @@ Ant Design 是蚂蚁集团用于交付企业软件的开源设计系统，主要
 
 永远不要在产品代码里写死 `#FFF` 或 `#FAFAFA`。读 Token。三层模型让暗色算法可以翻转表面阶梯而不拆布局。
 
-## 层级与深度
+### 层级与深度
 
 Ant Design 是 **flat-first（扁平优先）**。层级由边框和色调对比承担。阴影只出现在真正浮于上下文之上的表面。
 
@@ -275,7 +308,7 @@ Ant Design 是 **flat-first（扁平优先）**。层级由边框和色调对比
 
 缓动是预定义的：`motionEaseInOut`、`motionEaseOut`、`motionEaseIn`、`motionEaseOutBack`、`motionEaseOutCirc` 等。不要任意挑选 `transition-timing-function`。若设计需求对不上现有缓动，用 `motionEaseInOut` 然后继续。
 
-## 形状
+### 形状
 
 默认圆角是 **6px**。足够现代亲和，又小到 32px 高的按钮仍呈现干净、接近矩形的轮廓，适合密集表单。
 
@@ -288,7 +321,7 @@ Ant Design 是 **flat-first（扁平优先）**。层级由边框和色调对比
 
 全胶囊（`rounded.full`，9999px）只给圆形头像、徽标和圆点——不给按钮或标签。直角（0px）留给表格和分段控件的内边。相邻元素混用圆角是坏味道：8px 圆角的卡片里不该放 16px 圆角的按钮。
 
-## 组件
+### 组件
 
 组件原型捕捉系统最常见的表面和状态。下列每一项都对应 YAML front-matter 中的 Token 引用。
 
@@ -307,7 +340,7 @@ Ant Design 是 **flat-first（扁平优先）**。层级由边框和色调对比
 - **Tooltip** —— 高对比反相表面：`rgba(0,0,0,0.85)` 背景、白字。始终由框架定位，不要手动钉死。
 - **Dropdown menu（项悬停）** —— 悬停用 `surface-container` 填充，不改文字色。悬停提示本身已经足够。
 
-## 对与错
+### 对与错
 
 - **做** 用四条设计价值观当平局裁决。两种做法冲突时，更能让用户状态确定、更易读的那个胜出。
 - **不做** 同一表面叠两个 `primary` 色按钮。只留一个，其余降为 `default`。
@@ -320,7 +353,7 @@ Ant Design 是 **flat-first（扁平优先）**。层级由边框和色调对比
 - **做** 通过间距刻度，把每一个间隙、内边距和槽对齐 4px 网格。
 - **不做** 在产品代码里用魔法数字。刻度缺一档时，该重看设计，而不是一像素覆盖。
 
-## 定制
+### 定制
 
 上文 YAML front-matter 中的每个值都是 `defaultAlgorithm` 产出的**默认值**——浅色主题。Ant Design 主题化比替换 Design Token 更广：包含算法派生、组件级覆盖、动态切换、嵌套主题作用域、CSS 变量输出、静态 Token 消费，以及零运行时 CSS 提取。完整运行时 API 与示例见 [Customize Theme](https://ant.design/docs/react/customize-theme.md)。
 

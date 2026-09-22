@@ -163,7 +163,7 @@ def render_component(slug: str, full: dict[str, str] | None, semantics: list[dic
         lines += ["", description]
     lines += ["", "## 何时使用", ""]
     lines.append((full or {}).get("when") or "官方文档未提供「何时使用」。按页面模式选择该组件，不要用自定义等价物替代。")
-    lines += ["", "## PKUSE", "", "- 视觉与 Token 遵循 `references/design-system.md` 和 `references/ant-design-v6.zh.md`。"]
+    lines += ["", "## PKUSE", "", "- 视觉与 Token 遵循 `references/DESIGN.md`。"]
     extra = PKUSE_NOTES.get(slug)
     if extra:
         lines.append(extra)

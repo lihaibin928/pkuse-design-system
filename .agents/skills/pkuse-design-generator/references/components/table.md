@@ -17,7 +17,7 @@
 
 ## PKUSE
 
-- 视觉与 Token 遵循 `references/design-system.md` 和 `references/ant-design-v6.zh.md`。
+- 视觉与 Token 遵循 `references/DESIGN.md`。
 - 列表主界面用表格，不要用卡片宫格替代。
 - 表头和状态色走 Token；默认不做斑马纹。
 - 删除 / 批量操作必须确认，并校验权限。

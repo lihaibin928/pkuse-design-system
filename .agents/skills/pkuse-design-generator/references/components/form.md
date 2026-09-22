@@ -17,7 +17,7 @@
 
 ## PKUSE
 
-- 视觉与 Token 遵循 `references/design-system.md` 和 `references/ant-design-v6.zh.md`。
+- 视觉与 Token 遵循 `references/DESIGN.md`。
 - 筛选条与编辑表单都用 `Form`，提交走类型化 Service。
 - 校验失败定位到字段，保留已输入内容。
 - 需要改外观时使用下面的语义槽 `classNames` / `styles`，不要写无前缀的 `.ant-*` 选择器。

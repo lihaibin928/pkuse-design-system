@@ -5,15 +5,15 @@ description: Generates complete enterprise React admin sub-applications using Um
 
 # PKUSE Design Generator
 
-生成完整可运行的企业后台子应用，而不是组件展览。工程结构以 `assets/base-app/` 脚手架模板与 `references/engineering.md` 为准。
+生成完整可运行的企业后台子应用，而不是组件展览。工程结构以 `assets/base-app/` 脚手架模板为准。
 
 对用户的全部回复使用简体中文：询问补全信息、进度说明、校验结果和最终汇报均用中文。代码标识符、命令、路径、权限码和 Token 名称保持原样。
 
 ## 工作流
 
-1. 用 `references/page-patterns.md` 判断场景。
+1. 根据用户描述判断场景（数据管理、审批流程、监控运维、仪表盘或系统配置）。
 2. 只询问会改变架构且无法可靠推断的信息：应用名、核心实体、角色、关键操作或特殊字段。
-3. 阅读 `references/design-system.md`、`references/qiankun-contract.md` 和 `references/engineering.md`。
+3. 阅读 `references/DESIGN.md`。
 4. 运行 `python scripts/scaffold.py --name <kebab-name> --title "<title>" --scene <scene> --output <path>`。
 5. 生成领域页面时先读 `references/components/INDEX.md`，再只打开实际用到的 `references/components/<name>.md`。
 6. 仅当拆分文件缺少少见 API 或示例时，再打开 `references/antd/llms-full-cn.txt` 或 `references/antd/llms-semantic-cn.md` 里对应的 `## <name>-cn` 章节。不要整份阅读这两份快照。
@@ -24,7 +24,7 @@ description: Generates complete enterprise React admin sub-applications using Um
 
 ## 设计决策
 
-- 选择 Token、密度或主题时，阅读 `references/ant-design-v6.md` 或其译文 `references/ant-design-v6.zh.md`。
+- 选择 Token、密度或主题时，阅读 `references/DESIGN.md` 的「Ant Design v6 基线规范」部分。
 - 选择或实现具体组件时，阅读 `references/components/<name>.md`，不要把 `references/antd/` 下的全文快照整份读进上下文。
 - 主色保持 Ant Design 默认蓝 `#1677FF`。不要把成功绿或自定义绿色壳层当作品牌色。
 - 保留 `/design-system` 预览路由，便于对照基线 Token 和组件。

@@ -14,11 +14,7 @@ class SkillStructureTest(unittest.TestCase):
         self.assertIn("后台", skill)
         for name in (
             "ant-design-v6.md",
-            "ant-design-v6.zh.md",
-            "design-system.md",
-            "qiankun-contract.md",
-            "page-patterns.md",
-            "engineering.md",
+            "DESIGN.md",
         ):
             self.assertTrue((ROOT / "references" / name).is_file(), name)
         self.assertTrue((ROOT / "references/antd/llms-full-cn.txt").is_file())
@@ -30,18 +26,17 @@ class SkillStructureTest(unittest.TestCase):
         self.assertIn("components/INDEX.md", skill)
         self.assertIn("不要整份阅读", skill)
 
-    def test_overlay_links_to_source_without_duplicating_it(self) -> None:
+    def test_design_spec_merges_overlay_and_baseline(self) -> None:
         source = (ROOT / "references/ant-design-v6.md").read_text(encoding="utf-8")
-        zh = (ROOT / "references/ant-design-v6.zh.md").read_text(encoding="utf-8")
-        overlay = (ROOT / "references/design-system.md").read_text(encoding="utf-8")
+        design = (ROOT / "references/DESIGN.md").read_text(encoding="utf-8")
         self.assertIn("https://ant.design/design.md", source)
         self.assertIn("Natural", source)
-        self.assertIn("ant-design-v6.md", overlay)
-        self.assertIn("ant-design-v6.zh.md", overlay)
-        self.assertIn("components/INDEX.md", overlay)
-        self.assertIn("概述", zh)
-        self.assertIn("#1677FF", zh)
-        self.assertLess(len(overlay), len(source))
+        self.assertIn("# Pkuse Design 设计规范", design)
+        self.assertIn("## Pkuse 生成规则", design)
+        self.assertIn("## Ant Design v6 基线规范", design)
+        self.assertIn("#1677FF", design)
+        self.assertIn("概述", design)
+        self.assertIn("components/INDEX.md", design)
 
     def test_component_files_drop_abstract_dom_and_keep_when_to_use(self) -> None:
         button = (ROOT / "references/components/button.md").read_text(encoding="utf-8")
