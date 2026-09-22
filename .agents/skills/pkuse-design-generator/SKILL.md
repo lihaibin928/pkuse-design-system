@@ -5,7 +5,7 @@ description: Generates complete enterprise React admin sub-applications using Um
 
 # PKUSE Design Generator
 
-生成完整可运行的企业后台子应用，而不是组件展览。工程结构以 `assets/base-app/` 脚手架模板为准。
+生成完整可运行的企业后台子应用，而不是组件展览。
 
 对用户的全部回复使用简体中文：询问补全信息、进度说明、校验结果和最终汇报均用中文。代码标识符、命令、路径、权限码和 Token 名称保持原样。
 
@@ -14,13 +14,12 @@ description: Generates complete enterprise React admin sub-applications using Um
 1. 根据用户描述判断场景（数据管理、审批流程、监控运维、仪表盘或系统配置）。
 2. 只询问会改变架构且无法可靠推断的信息：应用名、核心实体、角色、关键操作或特殊字段。
 3. 阅读 `references/DESIGN.md`。
-4. 运行 `python scripts/scaffold.py --name <kebab-name> --title "<title>" --scene <scene> --output <path>`。
-5. 生成领域页面时先读 `references/components/INDEX.md`，再只打开实际用到的 `references/components/<name>.md`。
-6. 仅当拆分文件缺少少见 API 或示例时，再打开 `references/antd/llms-full-cn.txt` 或 `references/antd/llms-semantic-cn.md` 里对应的 `## <name>-cn` 章节。不要整份阅读这两份快照。
-7. 按 Feature 模块化生成页面：`src/features/<slice>/{types,services,hooks,components}`，`src/pages/` 只做薄组装；更新 `src/router/routes.ts`、`src/access.ts` 与 `mock/`。
-8. 运行 `python scripts/validate.py <path> --run-commands`。
-9. 修复全部报错并重新校验。
-10. 用中文汇报输出路径、命令、本地角色、所选模式、校验结果和仍走 Mock 的真实 API 清单。
+4. 生成领域页面时先读 `references/components/INDEX.md`，再只打开实际用到的 `references/components/<name>.md`。
+5. 仅当拆分文件缺少少见 API 或示例时，再打开 `references/antd/llms-full-cn.txt` 或 `references/antd/llms-semantic-cn.md` 里对应的 `## <name>-cn` 章节。不要整份阅读这两份快照。
+6. 按 Feature 模块化生成页面：`src/features/<slice>/{types,services,hooks,components}`，`src/pages/` 只做薄组装；更新 `src/router/routes.ts`、`src/access.ts` 与 `mock/`。
+7. 运行 `python scripts/validate.py <path> --run-commands`。
+8. 修复全部报错并重新校验。
+9. 用中文汇报输出路径、命令、本地角色、所选模式、校验结果和仍走 Mock 的真实 API 清单。
 
 ## 设计决策
 

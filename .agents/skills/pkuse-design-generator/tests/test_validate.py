@@ -17,13 +17,6 @@ assert SPEC and SPEC.loader
 sys.modules[SPEC.name] = MODULE
 SPEC.loader.exec_module(MODULE)
 
-SCAFFOLD_SPEC = importlib.util.spec_from_file_location(
-    "scaffold", ROOT / "scripts/scaffold.py"
-)
-SCAFFOLD = importlib.util.module_from_spec(SCAFFOLD_SPEC)
-assert SCAFFOLD_SPEC and SCAFFOLD_SPEC.loader
-sys.modules[SCAFFOLD_SPEC.name] = SCAFFOLD
-SCAFFOLD_SPEC.loader.exec_module(SCAFFOLD)
 
 REAL_APP_TS = """
 export const qiankun = {
@@ -574,13 +567,6 @@ export function HomePage({ service }) {
             (project / "package.json").write_text("{not-json", encoding="utf-8")
             report = MODULE.validate(project, run_commands=False)
             self.assertTrue(any("invalid package.json" in item for item in report.errors))
-
-    def test_accepts_scaffolded_project_static_checks(self) -> None:
-        with TemporaryDirectory() as temp:
-            project = Path(temp) / "inventory-console"
-            SCAFFOLD.scaffold("inventory-console", "库存中心", "data-management", project)
-            report = MODULE.validate(project, run_commands=False)
-            self.assertEqual([], report.errors, msg="\n".join(report.errors))
 
     def test_yarn_not_found_reports_clear_error(self) -> None:
         with TemporaryDirectory() as temp:
