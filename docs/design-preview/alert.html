@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>警告提示 · Pkuse Design 设计规范</title>
-  <link rel="stylesheet" href="assets/theme.css?v=2" />
+  <link rel="stylesheet" href="assets/theme.css?v=8" />
 </head>
 <body data-page="alert">
   <div class="shell">
@@ -12,16 +12,12 @@
     <main>
 <h2 id="alert">警告提示</h2>
       <div class="card">
-        <h3>Alert</h3>
-        <p class="note">语义反馈表面。成功/警告/错误/信息用浅语义底 + 正常文字色；状态由图标和底色传达，不用低对比的彩色正文。</p>
-        <div class="alert alert-success"><span class="alert-icon" style="background:#52C41A">✓</span>成功：只用 success 绿提示结果，不要把整页做成绿色。</div>
-        <div class="alert alert-warning"><span class="alert-icon" style="background:#FAAD14">!</span>警告：空数据用 Empty，保留查询区。</div>
-        <div class="alert alert-error"><span class="alert-icon" style="background:#FF4D4F">×</span>错误：用 Result；401 和 403 分开。</div>
-        <div class="alert alert-info"><span class="alert-icon" style="background:#1677FF">i</span>信息：加载中用 Spin，不要换一套绿色骨架屏。</div>
+        <h3 style="margin-top:0">Alert · 四种语义</h3>
+        <p class="note" style="margin:0 0 16px">浅底深字，图标表达语义；错误提示可关闭。以下为真实组件渲染。</p>
+        <div id="alert-mount">正在加载组件（本地依赖，约数秒）…</div>
       </div>
-
     </main>
   </div>
-  <script src="assets/layout.js?v=2"></script>
+  <script src="assets/layout.js?v=8"></script>
 </body>
 </html>

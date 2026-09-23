@@ -314,3 +314,7 @@ a.nav-child { padding-left: 28px; }
 .icon-color-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; font-size: 13px; }
 .nav-subgroup { padding: 8px 12px 2px 28px; margin: 0; color: var(--text-secondary); font-size: 13px; line-height: 20px; }
 a.nav-child-deep { padding-left: 44px; }
+.field-demo { background: var(--surface); border: 1px solid var(--outline-variant); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 16px; }
+.field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.field-grid .field-demo { margin-bottom: 0; }
+@media (max-width: 1000px) { .field-grid { grid-template-columns: 1fr; } }

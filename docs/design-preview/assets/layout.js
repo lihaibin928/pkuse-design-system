@@ -16,20 +16,9 @@
       ['通用', [['button', '按钮'], ['proskeleton', '骨架屏']]],
       ['导航', [['breadcrumb', '面包屑'], ['tabs', '标签页'], ['dropdown', '下拉菜单']]],
       ['数据录入', [
-        ['cascader', '级联选择'],
-        ['checkbox', '多选框'],
-        ['colorpicker', '颜色选择器'],
-        ['datepicker', '日期选择框'],
-        ['form', '表单'],
-        ['input', '输入框'],
-        ['inputnumber', '数字输入框'],
-        ['mentions', '提及'],
-        ['radio', '单选框'],
-        ['rate', '评分'],
-        ['select', '选择器'],
+        ['cascader', 'Cascader - 级联选择'],
+        ['form', 'FormFields - 表单项'],
         ['slider', '滑动输入条'],
-        ['switch', '开关'],
-        ['timepicker', '时间选择框'],
         ['transfer', '穿梭框'],
         ['treeselect', '树选择'],
         ['upload', '上传']
@@ -37,17 +26,11 @@
       ['数据展示', [
         ['avatar', '头像'],
         ['badge', '徽标数'],
-        ['calendar', '日历'],
         ['card', '卡片'],
-        ['carousel', '走马灯'],
         ['collapse', '折叠面板'],
         ['descriptions', '描述列表'],
         ['empty', '空状态'],
-        ['image', '图片'],
-        ['list', '列表'],
-        ['listy', '虚拟列表'],
         ['popover', '气泡卡片'],
-        ['qrcode', '二维码'],
         ['segmented', '分段控制器'],
         ['statistic', '统计数值'],
         ['table', '表格'],
@@ -66,7 +49,6 @@
         ['popconfirm', '气泡确认框'],
         ['progress', '进度条'],
         ['result', '结果'],
-        ['skeleton', '骨架屏'],
         ['spin', '加载中'],
         ['watermark', '水印']
       ]],
@@ -79,7 +61,7 @@
       ]]
     ]],
     ['scenes', '页面模版', [
-      ['scene-entry', '数据录入'],
+      ['scene-entry', '新建/编辑表单'],
       ['scene-simple', '简易数据展示'],
       ['scene-display', '复杂数据展示']
     ]],
