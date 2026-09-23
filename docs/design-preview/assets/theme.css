@@ -57,19 +57,19 @@
     a:hover { color: var(--primary-hover); }
     code, .mono { font-family: var(--font-code); font-size: 13px; line-height: 20px; }
     .shell { display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
-    nav {
+    #site-nav {
       position: sticky; top: 0; height: 100vh; overflow: auto;
       background: var(--surface);
       border-right: 1px solid var(--outline);
       padding: 24px 16px;
     }
-    nav .brand { font-weight: 600; font-size: 16px; line-height: 24px; margin: 0 0 24px; }
-    nav a {
+    #site-nav .brand { font-weight: 600; font-size: 16px; line-height: 24px; margin: 0 0 24px; }
+    #site-nav a {
       display: block; padding: 8px 12px; border-radius: var(--radius);
       color: var(--text); margin-bottom: 4px;
     }
-    nav a:hover { background: var(--surface-container); }
-    nav a.active, nav a:target { background: var(--primary-bg); color: var(--primary); }
+    #site-nav a:hover { background: var(--surface-container); }
+    #site-nav a.active, #site-nav a:target { background: var(--primary-bg); color: var(--primary); }
     main { padding: 32px 40px 80px; max-width: 1120px; }
     h2 { font-size: 20px; line-height: 28px; font-weight: 600; margin: 48px 0 16px; }
     main > h2:first-child { margin-top: 0; }
@@ -239,14 +239,14 @@
     #protable-mount { min-height: 120px; }
     @media (max-width: 800px) {
       .shell { grid-template-columns: 1fr; }
-      nav { position: relative; height: auto; }
+      #site-nav { position: relative; height: auto; }
       main { padding: 16px 16px 48px; }
       .card { padding: 16px; }
       .compare, .values, .alpha-row { grid-template-columns: 1fr; }
       .type-row { grid-template-columns: 1fr; gap: 4px; }
     }
 .nav-group { padding: 8px 12px; margin: 0 0 4px; color: var(--text); font-size: 14px; line-height: 22px; border-radius: var(--radius); }
-a.nav-child { padding-left: 28px; }
+#site-nav a.nav-child { padding-left: 28px; }
 .ant-pro-table .ant-table-thead > tr > th { text-align: center; }
 #protable-simple-mount .ant-pro-card-body { padding: 0 24px 16px !important; }
 .back-row { margin: 0 0 16px; }
@@ -313,7 +313,7 @@ a.nav-child { padding-left: 28px; }
 .icon-size-item { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 13px; }
 .icon-color-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; font-size: 13px; }
 .nav-subgroup { padding: 8px 12px 2px 28px; margin: 0; color: var(--text-secondary); font-size: 13px; line-height: 20px; }
-a.nav-child-deep { padding-left: 44px; }
+#site-nav a.nav-child-deep { padding-left: 44px; }
 .field-demo { background: var(--surface); border: 1px solid var(--outline-variant); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 16px; }
 .field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
 .field-grid .field-demo { margin-bottom: 0; }
