@@ -12,3 +12,6 @@ __pycache__/
 !.env.example
 # Eval runs install full generated apps; do not upload
 .cursor/skills/pkuse-design-generator-workspace/
+
+# Mimosa security-scan plugin local state
+.mimosa/

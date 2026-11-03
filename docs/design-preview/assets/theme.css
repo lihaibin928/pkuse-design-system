@@ -56,7 +56,12 @@
     a { color: var(--primary); text-decoration: none; }
     a:hover { color: var(--primary-hover); }
     code, .mono { font-family: var(--font-code); font-size: 13px; line-height: 20px; }
-    .shell { display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
+    .hex { white-space: nowrap; }
+    .hex .dot {
+      display: inline-block; width: 14px; height: 14px; border-radius: 3px;
+      vertical-align: -2px; margin-left: 4px;
+    }
+    .shell { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: 100vh; }
     #site-nav {
       position: sticky; top: 0; height: 100vh; overflow: auto;
       background: var(--surface);
@@ -70,7 +75,7 @@
     }
     #site-nav a:hover { background: var(--surface-container); }
     #site-nav a.active, #site-nav a:target { background: var(--primary-bg); color: var(--primary); }
-    main { padding: 32px 40px 80px; max-width: 1120px; }
+    main { width: 100%; max-width: 1280px; margin: 0 auto; padding: 32px 48px 80px; }
     h2 { font-size: 20px; line-height: 28px; font-weight: 600; margin: 48px 0 16px; }
     main > h2:first-child { margin-top: 0; }
     h3 { font-size: 16px; line-height: 24px; font-weight: 600; margin: 24px 0 12px; }
