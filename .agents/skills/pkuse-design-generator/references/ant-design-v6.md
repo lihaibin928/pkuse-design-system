@@ -1,7 +1,7 @@
 <!--
 Source: https://ant.design/design.md
 Captured: 2026-08-18
-Runtime baseline verified: antd 6.6.1
+Runtime baseline verified: antd 6.7.1
 -->
 
 ---

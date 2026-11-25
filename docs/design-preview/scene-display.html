@@ -3,22 +3,56 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>复杂数据展示 · Pkuse Design 设计规范</title>
-  <link rel="stylesheet" href="assets/theme.css?v=30" />
+  <title>复杂数据展示 · Pkuse Design 页面模版</title>
+  <link rel="stylesheet" href="assets/theme.css?v=125" />
 </head>
-<body data-page="scene-display">
-  <div class="shell">
-    <nav id="site-nav"></nav>
-    <main>
-<h2 id="scene-display">复杂数据展示</h2>
-      <p class="lead">使用 ProTable 组件展示登记记录列表：状态用语义徽标，分类用预设色 Tag，工具栏与分页为组件默认行为。属于 Pkuse Design 页面模版，落地实现以 skill 生成的真实应用为准。</p>
-
-      <div class="card">
-        <div id="protable-mount">正在加载 ProTable 组件（首次访问需联网，约数秒）…</div>
+<body class="app-frame">
+  <header class="lm-header af-header">
+    <span class="lm-logo-icon"></span>
+    <span class="lm-brand">产品研发部创新研发中心</span>
+    <span class="lm-menu">
+      <span class="nav-arrow" id="nav-arrow-left" aria-label="向左滚动">‹</span>
+      <span class="lm-menu-scroll" id="app-nav-mount">正在加载导航…</span>
+      <span class="nav-arrow" id="nav-arrow-right" aria-label="向右滚动">›</span>
+    </span>
+    <span class="lm-actions">
+      <span class="af-badge">Ai⁺</span>
+      <span class="lm-help">?</span>
+      <span class="lm-ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a6.5 6.5 0 0 0-6.5 6.5v3.3c0 .6-.24 1.18-.66 1.6l-1.2 1.2c-.63.64-.18 1.72.73 1.72h15.26c.9 0 1.36-1.08.72-1.72l-1.2-1.2a2.26 2.26 0 0 1-.65-1.6V8.5A6.5 6.5 0 0 0 12 2z"/><path d="M9.4 17.6a2.7 2.7 0 0 0 5.2 0h-5.2z"/></svg></span>
+      <span class="lm-avatar">管</span>
+    </span>
+  </header>
+  <div class="af-body">
+    <aside class="af-sider">
+      <div id="af-sider-menu-mount">正在加载菜单…</div>
+    </aside>
+    <main class="af-content">
+      <div class="af-inner">
+      <div id="protable-mount">正在加载 ProTable 组件（首次访问需加载本地依赖，约数秒）…</div>
       </div>
     </main>
   </div>
-  <script src="assets/layout.js?v=30"></script>
-  <script src="vendor/protable.js?v=30"></script>
+  <script src="vendor/protable.js?v=125"></script>
+  <script>
+    var navScroll = document.getElementById('app-nav-mount');
+    var arrowL = document.getElementById('nav-arrow-left');
+    var arrowR = document.getElementById('nav-arrow-right');
+
+    function updateNavArrows() {
+      var max = navScroll.scrollWidth - navScroll.clientWidth;
+      arrowL.classList.toggle('disabled', navScroll.scrollLeft <= 1);
+      arrowR.classList.toggle('disabled', navScroll.scrollLeft >= max - 1);
+    }
+    arrowL.addEventListener('click', function () { navScroll.scrollBy({ left: -240, behavior: 'smooth' }); });
+    arrowR.addEventListener('click', function () { navScroll.scrollBy({ left: 240, behavior: 'smooth' }); });
+    navScroll.addEventListener('scroll', updateNavArrows);
+    navScroll.addEventListener('wheel', function (e) {
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { navScroll.scrollLeft += e.deltaY; e.preventDefault(); }
+    }, { passive: false });
+    updateNavArrows();
+    // 导航内容由 bundle 异步挂载，挂载完成或窗口变化后重新计算箭头状态
+    new MutationObserver(updateNavArrows).observe(navScroll, { childList: true, subtree: true });
+    window.addEventListener('resize', updateNavArrows);
+  </script>
 </body>
 </html>

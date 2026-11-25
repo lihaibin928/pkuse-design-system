@@ -1,0 +1,20 @@
+{
+  "name": "pkuse-protable-build",
+  "private": true,
+  "version": "1.0.0",
+  "description": "docs/design-preview/vendor/protable.js 的构建源（antd 6.7.1）",
+  "scripts": {
+    "build": "esbuild entry.js --bundle --minify --format=iife --define:process.env.NODE_ENV='\"production\"' --outfile=../protable.js"
+  },
+  "dependencies": {
+    "@ant-design/icons": "6.3.2",
+    "@ant-design/pro-components": "3.1.14-0",
+    "antd": "6.7.1",
+    "dayjs": "1.11.13",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  }
+}

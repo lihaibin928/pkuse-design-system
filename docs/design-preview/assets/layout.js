@@ -11,7 +11,7 @@
       ['shapes', '形状'],
       ['icons', '图标']
     ]],
-    ['app-layout', '布局', 'demo'],
+    ['app-layout', '布局'],
     ['components', '组件', [
       ['通用', [['button', 'Button - 按钮'], ['proskeleton', 'Skeleton - 骨架屏']]],
       ['导航', [['breadcrumb', 'Breadcrumb - 面包屑'], ['tabs', 'Tabs - 标签页'], ['dropdown', 'Dropdown - 下拉菜单']]],
@@ -58,9 +58,8 @@
       ]]
     ]],
     ['scenes', '页面模版', [
-      ['scene-entry', '新建/编辑表单'],
-      ['scene-simple', '简易数据展示'],
-      ['scene-display', '复杂数据展示']
+      ['scene-entry', '新建/编辑表单', 'blank'],
+      ['scene-display', '复杂数据展示', 'blank']
     ]],
     ['rules', '对与错'],
     ['customize', '定制']
@@ -68,10 +67,6 @@
   var current = document.body.dataset.page || '';
   var html = '<p class="brand">PKUSE 设计规范</p>';
   pages.forEach(function (p) {
-    if (p[2] === 'demo') {
-      html += '<a href="javascript:void(0)" class="nav-demo" data-demo="' + p[0] + '">' + p[1] + '</a>';
-      return;
-    }
     if (p[2]) {
       html += '<p class="nav-group">' + p[1] + '</p>';
       p[2].forEach(function (c) {
@@ -84,7 +79,8 @@
           return;
         }
         var active = c[0] === current ? ' active' : '';
-        html += '<a class="nav-child' + active + '" href="' + c[0] + '.html">' + c[1] + '</a>';
+        var target = c[2] === 'blank' ? ' target="_blank"' : '';
+        html += '<a class="nav-child' + active + '" href="' + c[0] + '.html"' + target + '>' + c[1] + '</a>';
       });
       return;
     }
@@ -93,24 +89,90 @@
   });
   nav.innerHTML = html;
 
-  function showLayoutDemo(link) {
-    var main = document.querySelector('main');
-    if (!main) return;
-    main.innerHTML = '';
-    var frame = document.createElement('iframe');
-    frame.src = 'layout-demo.html';
-    frame.title = '布局演示';
-    frame.style.cssText = 'width:100%;height:calc(100vh - 112px);border:0;display:block;border-radius:8px;background:var(--surface-layout)';
-    main.appendChild(frame);
-    nav.querySelectorAll('a').forEach(function (a) { a.classList.remove('active'); });
-    if (link) link.classList.add('active');
-    window.scrollTo(0, 0);
+  // ===== 局部刷新：点击菜单只替换右侧内容区，左侧导航不重载 =====
+  // file:// 协议下浏览器禁止 fetch 本地文件，保持原生跳转（双击 index.html 离线浏览不受影响）
+  if (location.protocol === 'file:') return;
+
+  var swapping = false;
+
+  function setActive(href) {
+    nav.querySelectorAll('a').forEach(function (a) {
+      a.classList.toggle('active', a.getAttribute('href') === href);
+    });
   }
 
-  nav.addEventListener('click', function (e) {
-    var link = e.target.closest ? e.target.closest('.nav-demo') : null;
-    if (!link) return;
+  function ensureVendor(doc) {
+    var need = doc.querySelector('script[src*="vendor/protable"]');
+    var have = document.querySelector('script[src*="vendor/protable"], script[data-pk-vendor]');
+    if (!need || (have && window.__pkRender)) return Promise.resolve();
+    var s = document.createElement('script');
+    s.src = need.getAttribute('src');
+    s.dataset.pkVendor = '1';
+    return new Promise(function (resolve) {
+      s.onload = s.onerror = function () { resolve(); };
+      document.body.appendChild(s);
+    });
+  }
+
+  function swapPage(href, push) {
+    if (swapping) return;
+    swapping = true;
+    fetch(href).then(function (res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.text();
+    }).then(function (text) {
+      var doc = new DOMParser().parseFromString(text, 'text/html');
+      // 1) .shell 骨架整体保留（导航元素不重建、滚动位置自然保留），只替换它里面除导航外的内容
+      var shell = document.querySelector('.shell');
+      var newShell = doc.querySelector('.shell');
+      if (!shell || !newShell) throw new Error('shell missing');
+      Array.prototype.slice.call(shell.children).forEach(function (child) {
+        if (child.id !== 'site-nav') child.remove();
+      });
+      Array.prototype.slice.call(newShell.children).forEach(function (child) {
+        if (child.id === 'site-nav') return;
+        shell.appendChild(document.adoptNode(child));
+      });
+      // 2) body 顶层的其他动态节点（如 提示 toast）一并替换
+      Array.prototype.slice.call(document.body.children).forEach(function (child) {
+        if (child.tagName === 'SCRIPT' || child.classList.contains('shell')) return;
+        child.remove();
+      });
+      Array.prototype.slice.call(doc.body.children).forEach(function (child) {
+        if (child.tagName === 'SCRIPT' || child.classList.contains('shell')) return;
+        document.body.appendChild(document.adoptNode(child));
+      });
+      // 3) 重执行新页面携带的内联脚本（如 新建/编辑表单 的表单交互）
+      doc.body.querySelectorAll('script:not([src])').forEach(function (old) {
+        var s = document.createElement('script');
+        s.textContent = old.textContent;
+        document.body.appendChild(s);
+      });
+      document.title = doc.title;
+      setActive(href);
+      window.scrollTo(0, 0);
+      return ensureVendor(doc).then(function () {
+        if (window.__pkRender) window.__pkRender();
+      });
+    }).then(function () {
+      swapping = false;
+      if (push !== false) history.pushState({}, '', href);
+    }).catch(function () {
+      swapping = false;
+      // 任何一步失败（离线、404 等）回退为原生跳转
+      location.href = href;
+    });
+  }
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a[href$=".html"]');
+    if (!a || a.target === '_blank' || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
-    showLayoutDemo(link);
+    swapPage(a.getAttribute('href'));
+  });
+
+  window.addEventListener('popstate', function () {
+    var file = location.pathname.split('/').pop() || 'principles.html';
+    swapPage(file, false);
   });
 })();

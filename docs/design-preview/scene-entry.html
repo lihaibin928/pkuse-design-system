@@ -3,233 +3,62 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>新建/编辑表单 · Pkuse Design 设计规范</title>
-  <link rel="stylesheet" href="assets/theme.css?v=30" />
+  <title>新建/编辑表单 · Pkuse Design 页面模版</title>
+  <link rel="stylesheet" href="assets/theme.css?v=125" />
 </head>
-<body data-page="scene-entry">
-  <div class="shell">
-    <nav id="site-nav"></nav>
-    <main>
-<h2 id="scene-entry">新建/编辑表单</h2>
-      <p class="lead">现场信息登记表单：必填校验、录入规范与提交反馈。属于 Pkuse Design 页面模版，落地实现以 skill 生成的真实应用为准。</p>
-
-      <div class="card">
-        <div class="back-row">
-          <a href="scene-display.html" onclick="if (history.length > 1) { history.back(); return false; } return true;">← 返回</a>
-          <div class="back-actions" id="backActions">
-            <button class="btn-primary" type="button" onclick="submitEntry()">提 交</button>
-            <button class="btn-default" type="button" onclick="resetEntry()">重 置</button>
-          </div>
-        </div>
-        <div style="max-width:520px;margin:0 auto">
-          <div class="form-item" id="itemName">
-            <label><span class="req">*</span>姓名</label>
-            <input class="input" id="fieldName" placeholder="请输入姓名" />
-            <div class="error-text" id="nameError">请输入姓名</div>
-          </div>
-          <div class="form-item" id="itemPhone">
-            <label><span class="req">*</span>手机号</label>
-            <input class="input" id="fieldPhone" placeholder="请输入11位手机号" maxlength="11" />
-            <div class="error-text" id="phoneError">请输入正确的11位手机号</div>
-          </div>
-          <div class="form-item">
-            <label>部门</label>
-            <select class="input" id="fieldDept">
-              <option>研发部</option>
-              <option>产品部</option>
-              <option>运营部</option>
-            </select>
-          </div>
-          <div class="form-item">
-            <label>登记类型</label>
-            <div class="radio-row" id="typeRow">
-              <label class="radio-item"><input type="radio" name="regType" value="个人登记" checked />个人登记</label>
-              <label class="radio-item"><input type="radio" name="regType" value="团体登记" />团体登记</label>
+<body class="app-frame">
+  <header class="lm-header af-header">
+    <span class="lm-logo-icon"></span>
+    <span class="lm-brand">产品研发部创新研发中心</span>
+    <span class="lm-menu">
+      <span class="nav-arrow" id="nav-arrow-left" aria-label="向左滚动">‹</span>
+      <span class="lm-menu-scroll" id="app-nav-mount">正在加载导航…</span>
+      <span class="nav-arrow" id="nav-arrow-right" aria-label="向右滚动">›</span>
+    </span>
+    <span class="lm-actions">
+      <span class="af-badge">Ai⁺</span>
+      <span class="lm-help">?</span>
+      <span class="lm-ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a6.5 6.5 0 0 0-6.5 6.5v3.3c0 .6-.24 1.18-.66 1.6l-1.2 1.2c-.63.64-.18 1.72.73 1.72h15.26c.9 0 1.36-1.08.72-1.72l-1.2-1.2a2.26 2.26 0 0 1-.65-1.6V8.5A6.5 6.5 0 0 0 12 2z"/><path d="M9.4 17.6a2.7 2.7 0 0 0 5.2 0h-5.2z"/></svg></span>
+      <span class="lm-avatar">管</span>
+    </span>
+  </header>
+  <div class="af-body">
+    <aside class="af-sider">
+      <div id="af-sider-menu-mount">正在加载菜单…</div>
+    </aside>
+    <main class="af-content">
+      <div class="af-inner">
+        <div class="form-card">
+          <div class="back-row">
+            <a class="back" href="scene-display.html" onclick="if (history.length > 1) { history.back(); return false; } return true;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5m0 0 6-6m-6 6 6 6"/></svg>返回</a>
+            <span class="back-divider" aria-hidden="true"></span>
+            <div id="scene-breadcrumb-mount"></div>
+            <div class="back-actions" id="backActions">
+              <div id="back-actions-mount">正在加载按钮…</div>
             </div>
           </div>
-          <div class="form-item">
-            <label>备注</label>
-            <textarea class="input" id="fieldRemark" rows="3" placeholder="选填，补充说明信息"></textarea>
-          </div>
-          <div class="form-item">
-            <label>入职日期</label>
-            <input type="text" class="input" id="fieldDate" placeholder="请选择日期" readonly />
-          </div>
-          <div class="form-item">
-            <label>随行人数</label>
-            <div class="num-group">
-              <button class="num-btn" type="button" onclick="stepNum(-1)">−</button>
-              <input class="input" id="fieldNum" value="1" readonly />
-              <button class="num-btn" type="button" onclick="stepNum(1)">＋</button>
-            </div>
-          </div>
-          <div class="form-item">
-            <label>需要接送</label>
-            <label class="switch"><input type="checkbox" id="fieldPickup"><span class="switch-ui"></span></label>
-          </div>
-          <div class="form-item">
-            <label>随行设备</label>
-            <div class="check-row" id="deviceRow">
-              <label class="check-item"><input type="checkbox" value="相机" />相机</label>
-              <label class="check-item"><input type="checkbox" value="三脚架" />三脚架</label>
-              <label class="check-item"><input type="checkbox" value="无人机" />无人机</label>
-            </div>
-          </div>
-          <div class="form-item">
-            <label>服务评分</label>
-            <div class="rate" id="rateRow">
-              <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
-            </div>
-          </div>
-          <div class="form-item">
-            <label>携带物品重量（kg）</label>
-            <input type="range" class="range-input" id="fieldWeight" min="0" max="30" value="0" oninput="setSlider(this); document.getElementById('weightVal').textContent = this.value" />
-            <div class="note">当前：<span id="weightVal">0</span> kg</div>
-          </div>
-          <div class="form-item">
-            <label>附件上传</label>
-            <div class="upload-box" onclick="document.getElementById('fileInput').click()">
-              <input type="file" id="fileInput" style="display:none" onchange="showToast(this.files.length ? '已选择文件：' + this.files[0].name : '')" />
-              <div>点击或拖拽文件到此区域上传</div>
-              <div class="note" style="margin-top:4px">支持单个文件，上传后可在详情中查看</div>
-            </div>
-          </div>
-          <div style="display:flex;gap:8px;justify-content:center" id="entryActions">
-            <button class="btn-primary" type="button" onclick="submitEntry()">提 交</button>
-            <button class="btn-default" type="button" onclick="resetEntry()">重 置</button>
-          </div>
+          <div id="scene-form-mount">正在加载表单组件（本地依赖，约数秒）…</div>
         </div>
       </div>
     </main>
   </div>
-  <script src="assets/layout.js?v=30"></script>
   <div class="toast" id="toast"><span class="toast-icon">✓</span><span id="toastText"></span></div>
-
   <script>
+    var sceneFormRef = null;
     var toastTimer = null;
+    window.setSceneFormRef = function (ref) { sceneFormRef = ref; };
 
     function $(id) { return document.getElementById(id); }
 
     function submitEntry() {
-      var name = $('fieldName').value.trim();
-      var phone = $('fieldPhone').value.trim();
-      var nameOk = !!name;
-      var phoneOk = /^1\d{10}$/.test(phone);
-      $('itemName').classList.toggle('invalid', !nameOk);
-      $('nameError').style.display = nameOk ? 'none' : 'block';
-      $('itemPhone').classList.toggle('invalid', !phoneOk);
-      $('phoneError').style.display = phoneOk ? 'none' : 'block';
-      if (!nameOk || !phoneOk) return;
-      var type = document.querySelector('input[name="regType"]:checked').value;
-      showToast('提交成功：' + name + ' · ' + type);
-      resetEntry();
+      if (sceneFormRef && sceneFormRef.current) { sceneFormRef.current.submit(); }
+    }
+    function saveDraft() {
+      showToast('已暂存，可稍后继续填写');
     }
     function resetEntry() {
-      $('fieldName').value = '';
-      $('fieldPhone').value = '';
-      $('fieldRemark').value = '';
-      $('fieldDept').selectedIndex = 0;
-      document.querySelectorAll('#typeRow input')[0].checked = true;
-      closeDatePicker();
-      $('fieldDate').value = '';
-      $('fieldNum').value = 1;
-      $('fieldPickup').checked = false;
-      document.querySelectorAll('.check-item input').forEach(function (i) { i.checked = false; });
-      setRate(0);
-      $('fieldWeight').value = 0;
-      setSlider($('fieldWeight'));
-      $('weightVal').textContent = 0;
-      $('itemName').classList.remove('invalid');
-      $('nameError').style.display = 'none';
-      $('itemPhone').classList.remove('invalid');
-      $('phoneError').style.display = 'none';
+      if (sceneFormRef && sceneFormRef.current) { sceneFormRef.current.resetFields(); }
     }
-
-    function setSlider(el) {
-      var pct = ((el.value - el.min) / (el.max - el.min)) * 100;
-      el.style.setProperty('--pct', pct + '%');
-    }
-    setSlider(document.getElementById('fieldWeight'));
-
-    function stepNum(d) {
-      var el = document.getElementById('fieldNum');
-      el.value = Math.max(1, (parseInt(el.value, 10) || 1) + d);
-    }
-
-    function setRate(v) {
-      document.querySelectorAll('#rateRow span').forEach(function (s) {
-        s.classList.toggle('on', Number(s.dataset.v) <= v);
-      });
-    }
-    document.querySelectorAll('#rateRow span').forEach(function (s) {
-      s.addEventListener('click', function () { setRate(Number(s.dataset.v)); });
-    });
-
-    var dateInput = document.getElementById('fieldDate');
-    var datePanel = null, dateView = null;
-
-    function closeDatePicker() { if (datePanel) { datePanel.remove(); datePanel = null; } }
-
-    function renderDatePicker() {
-      var first = new Date(dateView.y, dateView.m, 1);
-      var startDow = (first.getDay() + 6) % 7;
-      var daysInMonth = new Date(dateView.y, dateView.m + 1, 0).getDate();
-      var daysPrev = new Date(dateView.y, dateView.m, 0).getDate();
-      var today = new Date();
-      var cells = '';
-      for (var i = 0; i < 42; i++) {
-        var dayNum = i - startDow + 1, m2 = dateView.m, y2 = dateView.y, other = false;
-        if (dayNum < 1) { dayNum += daysPrev; m2--; other = true; }
-        else if (dayNum > daysInMonth) { dayNum -= daysInMonth; m2++; other = true; }
-        var iso = y2 + '-' + String(m2 + 1).padStart(2, '0') + '-' + String(dayNum).padStart(2, '0');
-        var isToday = y2 === today.getFullYear() && m2 === today.getMonth() && dayNum === today.getDate();
-        var selected = dateInput.value === iso;
-        cells += '<button type="button" class="date-cell' + (other ? ' other' : '') + (isToday ? ' today' : '') + (selected ? ' selected' : '') + '" data-v="' + iso + '">' + dayNum + '</button>';
-      }
-      var week = ['一', '二', '三', '四', '五', '六', '日'].map(function (w) { return '<span>' + w + '</span>'; }).join('');
-      datePanel.innerHTML = '<div class="date-panel-head"><span class="date-panel-title">' + dateView.y + ' 年 ' + (dateView.m + 1) + ' 月</span><span class="date-panel-nav"><button type="button" data-nav="-1">‹</button><button type="button" data-nav="1">›</button></span></div><div class="date-panel-week">' + week + '</div><div class="date-panel-grid">' + cells + '</div>';
-    }
-
-    function openDatePicker() {
-      closeDatePicker();
-      datePanel = document.createElement('div');
-      datePanel.className = 'date-panel';
-      var holder = dateInput.closest('.form-item');
-      holder.appendChild(datePanel);
-      var base = dateInput.value ? dateInput.value.split('-') : null;
-      var now = new Date();
-      dateView = base ? { y: Number(base[0]), m: Number(base[1]) - 1 } : { y: now.getFullYear(), m: now.getMonth() };
-      renderDatePicker();
-      var ir = dateInput.getBoundingClientRect();
-      var hr = holder.getBoundingClientRect();
-      datePanel.style.top = (ir.bottom - hr.top + 4) + 'px';
-      datePanel.style.left = (ir.left - hr.left) + 'px';
-    }
-
-    dateInput.addEventListener('click', function () { datePanel ? closeDatePicker() : openDatePicker(); });
-
-    document.addEventListener('click', function (e) {
-      if (!datePanel) return;
-      var nav = e.target.closest ? e.target.closest('.date-panel [data-nav]') : null;
-      if (nav) {
-        dateView.m += Number(nav.dataset.nav);
-        if (dateView.m < 0) { dateView.m = 11; dateView.y--; }
-        if (dateView.m > 11) { dateView.m = 0; dateView.y++; }
-        renderDatePicker();
-        return;
-      }
-      var cell = e.target.closest ? e.target.closest('.date-panel .date-cell') : null;
-      if (cell) { dateInput.value = cell.dataset.v; closeDatePicker(); return; }
-      if (!e.target.closest('.date-panel') && e.target !== dateInput) closeDatePicker();
-    });
-
-    var bottomActions = document.getElementById('entryActions');
-    var backActions = document.getElementById('backActions');
-    var actionsObserver = new IntersectionObserver(function (entries) {
-      backActions.classList.toggle('hidden', entries[0].isIntersecting);
-    }, { threshold: 0.9 });
-    actionsObserver.observe(bottomActions);
-
     function showToast(text) {
       var t = $('toast');
       $('toastText').textContent = text;
@@ -237,6 +66,28 @@
       clearTimeout(toastTimer);
       toastTimer = setTimeout(function () { t.style.display = 'none'; }, 2000);
     }
+
+    var navScroll = document.getElementById('app-nav-mount');
+    var arrowL = document.getElementById('nav-arrow-left');
+    var arrowR = document.getElementById('nav-arrow-right');
+
+    function updateNavArrows() {
+      var max = navScroll.scrollWidth - navScroll.clientWidth;
+      arrowL.classList.toggle('disabled', navScroll.scrollLeft <= 1);
+      arrowR.classList.toggle('disabled', navScroll.scrollLeft >= max - 1);
+    }
+    arrowL.addEventListener('click', function () { navScroll.scrollBy({ left: -240, behavior: 'smooth' }); });
+    arrowR.addEventListener('click', function () { navScroll.scrollBy({ left: 240, behavior: 'smooth' }); });
+    navScroll.addEventListener('scroll', updateNavArrows);
+    navScroll.addEventListener('wheel', function (e) {
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { navScroll.scrollLeft += e.deltaY; e.preventDefault(); }
+    }, { passive: false });
+    updateNavArrows();
+    // 导航内容由 bundle 异步挂载，挂载完成或窗口变化后重新计算箭头状态
+    new MutationObserver(updateNavArrows).observe(navScroll, { childList: true, subtree: true });
+    window.addEventListener('resize', updateNavArrows);
   </script>
+
+  <script src="vendor/protable.js?v=125"></script>
 </body>
 </html>

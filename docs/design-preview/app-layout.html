@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>布局 · Pkuse Design 设计规范</title>
+  <link rel="stylesheet" href="assets/theme.css?v=125" />
+</head>
+<body data-page="app-layout">
+  <div class="shell">
+    <nav id="site-nav"></nav>
+    <main>
+      <h2 id="app-layout">布局</h2>
+      <p class="lead">后台应用的整体框架分三个区域：顶栏承载品牌、一级导航与用户信息；左侧导航承载功能模块与多级菜单；内容区由页面组成——面包屑、标题、查询区、表格或表单。</p>
+
+      <div class="card">
+        <h3 style="margin-top:0">布局结构</h3>
+        <p class="note" style="margin:0 0 16px">以下为结构示意（静态线框），标注三个区域的组成与从属关系。</p>
+        <div class="layout-mock">
+          <div class="lm-header dark">
+            <span class="lm-logo"></span>
+            <span class="lm-menu"><span>首页</span><span class="on">要素中心</span><span>用户中心</span></span>
+            <span class="lm-actions">
+              <span class="af-badge">Ai⁺</span>
+              <span class="lm-help">?</span>
+              <span class="lm-ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a6.5 6.5 0 0 0-6.5 6.5v3.3c0 .6-.24 1.18-.66 1.6l-1.2 1.2c-.63.64-.18 1.72.73 1.72h15.26c.9 0 1.36-1.08.72-1.72l-1.2-1.2a2.26 2.26 0 0 1-.65-1.6V8.5A6.5 6.5 0 0 0 12 2z"/><path d="M9.4 17.6a2.7 2.7 0 0 0 5.2 0h-5.2z"/></svg></span>
+              <span class="lm-avatar">管</span>
+            </span>
+            <span class="lm-tag">顶栏 64px</span>
+          </div>
+          <div class="lm-body">
+            <div class="lm-sider">
+              <div class="lm-tag">侧边导航 200px</div>
+              <div class="item">subnav 1<span class="caret">▾</span></div>
+              <div class="sub on">option1</div>
+              <div class="sub">option2</div>
+              <div class="sub">option3</div>
+              <div class="sub">option4</div>
+              <div class="item">subnav 2<span class="caret">▸</span></div>
+              <div class="item">subnav 3<span class="caret">▸</span></div>
+            </div>
+            <div class="lm-content">
+              <div class="lm-page">
+                <div class="lm-crumb">Home / List / App</div>
+                Content
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="note" style="margin:16px 0 0">从属关系：应用 → 顶栏一级导航（nav）→ 侧边子导航分组（subnav）→ 页面（option）；当前项在侧边导航中以主色高亮，顶栏当前项以白色下划线标识。</p>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top:0">结构规范</h3>
+        <p>框架由 <code>ProLayout</code> 承载（mix 形态 + 分栏菜单）。以下是落地时的关键参数，与上图一一对应：</p>
+        <p>顶栏高 <code>56px</code>，白底；左侧品牌，中部一级导航，右侧通知、帮助与用户信息。</p>
+        <p>侧边导航宽 <code>208px</code>，白底，承载二、三级菜单；选中项背景 <code>#E6F4FF</code>、文字 <code>#1677FF</code>。</p>
+        <p style="margin-bottom:0">内容区页面容器内边距 <code>24px</code>，页面背景 <code>#F5F5F5</code>，内容卡片白底 8px 圆角。</p>
+      </div>
+    </main>
+  </div>
+  <script src="assets/layout.js?v=125"></script>
+</body>
+</html>

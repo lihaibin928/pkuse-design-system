@@ -2,7 +2,7 @@
 Source: https://ant.design/design.md
 Translation of: ant-design-v6.md
 Captured: 2026-08-18
-Runtime baseline verified: antd 6.6.1
+Runtime baseline verified: antd 6.7.1
 -->
 
 ---
@@ -240,6 +240,68 @@ components:
 - 表格、表单、导航、浮层和反馈优先使用 Ant Design 组件，不要先造自定义等价物。
 - 必须覆盖 hover、focus、loading、empty、error、disabled 和无权限状态。
 - 自定义 CSS 使用应用命名空间，并配置应用级 `prefixCls` 与 CSS Variable key。
+- antd v6 组件 API 以 `color` / `variant` 模型为准：虚线按钮用 `variant="dashed"`，旧 `dashed` 布尔属性已废弃不生效。
+
+### 页面模版与布局规范（Pkuse 叠加）
+
+以下为部门页面模版的原型构建标准，生成应用框架、表单页、列表页时按本节落地，覆盖上方基线的对应默认值。定稿原型见 `docs/design-preview/scene-entry.html`（表单页）与 `scene-display.html`（列表页），样式细节以 `docs/design-preview/assets/theme.css` 为准。
+
+**切图与字体资产（从 `docs/design-preview/assets/` 复制，不要重新导出）**
+
+| 文件 | 用途 | 说明 |
+| --- | --- | --- |
+| `header-bg.svg` | 顶栏底图 | Figma「Group 228」，1928×72 含出血边距 |
+| `logo-icon.svg` | 顶栏徽标 | Figma「image 87」，内容区 41×37 |
+| `layout-sider.svg` | 侧栏背景图 | 251×914，含出血边距 |
+| `fonts/inter-latin-400.woff2`、`fonts/inter-latin-500.woff2` | 侧栏菜单字体 | Inter latin 子集，中文回退 PingFang SC |
+
+**应用框架（顶栏 + 侧边菜单 + 主显示区）**
+
+顶栏（高 60px，固定在顶部）：
+
+- 背景：底色 `#EBF4FE` + `header-bg.svg`（`no-repeat 50% 0 / 100.4167% 112.5%`，切图出血裁掉后内容区正好铺满）+ 下缘阴影 `0 4px 4px rgba(0,0,0,.03)`。
+- 左起：徽标 41×37（`logo-icon.svg`，`-3.97px 0 / 121.03% 123.72%` 映射）、品牌字「方正小标宋 FZXiaoBiaoSong-B05」24px/400 `#333`（回退 STZhongsong / SimSun）、一级导航；右端：Ai⁺ 徽标、帮助、通知、用户头像。
+- 一级导航：纯文字项（14px `#333`），不带图标；选中项主色文字 + 底部 2px 主色短下划线（`::after`，距底 9px、左右缩进 14px、圆角 2px），不得出现第二条（白色）底线。
+- 导航超出可视宽度时溢出隐藏，两侧放 `‹` `›` 箭头按钮（22×22，`#4E5969`，hover 主色）：点击平滑滚动 240px，滚到头的一侧箭头隐藏；鼠标滚轮悬停在导航上时纵向滚动转为横向。
+- 顶栏内容均为固定元素，不随主显示区滚动。
+
+侧边菜单（宽 235px，固定）：
+
+- 背景：底色 `#F2F7FD` + `layout-sider.svg`（`no-repeat left -12px bottom -14px / 112% 108%`）+ 右缘阴影 `0 4px 7.8px rgba(0,46,98,.21)`。
+- 菜单项通栏（无圆角、无左右留白）：高 43px、项间距 6px（节距 49px）；图标 20×20 距左 31px；文字距左 59px（与图标间距 8px）。
+- 文字 Inter 16px/500 `#4E5969`（`@font-face` 自托管上方 woff2）；hover 浅主色底 `rgba(12,118,240,.08)`。
+- 选中态：通栏实色 `#0C76F0`，白字白图标（不是浅蓝底 + 主色文字）。
+- 不显示分组标签；不同页面使用不同语义图标（如表单页 `FormOutlined`、列表页 `TableOutlined`）。
+- 暂无收起态，不要自行添加收起功能。
+
+主显示区：
+
+- 背景 `#F7FBFF`，四周内边距 16px；顶栏与侧边菜单固定，仅主显示区滚动。
+
+**表单页（新建/编辑表单）**
+
+页面 = 主显示区里的一张白卡片（内边距 16px、圆角 8px、阴影 `0 1px 2px rgba(0,0,0,.05), 0 1px 6px -1px rgba(0,0,0,.03), 0 2px 4px rgba(0,0,0,.03)`），操作栏与表单都在卡片内；不要把表单裸放在页面底色上。
+
+- 操作栏在卡片内吸顶：高 52px、白底、下边线 `#F0F0F0`、上侧圆角与阴影与卡片一致；静止时位于卡片顶部（距顶栏 16px），滚动后吸附到主显示区顶缘（`position: sticky; top: -16px`，负外边距抵消卡片内边距）。
+- 操作栏结构：`← 返回`（线性箭头图标 + 文字 `rgba(0,0,0,.65)`，hover 主色）、1px 分隔线 `#F0F0F0`、面包屑、右侧 `暂存 / 提交 / 重置`。
+- 面包屑只做层级位置展示：仅当前页一项、纯文本、不做链接、`#1890FF` 文字（无外框）。
+- 操作按钮必须使用真实 antd Button（波纹等点击特效为组件原生行为），不要手写仿制。
+- 表单主体 ProForm：`layout: 'horizontal'`、`colon: false`、`labelCol: { flex: '0 0 84px' }`。**不要使用 `grid` / `colProps` / `labelWidth`**：该版本（pro-components 3.1.14-0）普通表单不处理 `labelWidth`，且关闭栅格后默认退化为纵向布局，必须显式 horizontal；两列栅格用样式实现——列距 48px、字段行距 22px、多行文本与上传区通栏。
+- 标签右对齐、色 `rgba(0,0,0,.65)`、右侧留白 10px；控件高 32px。
+- 字段分组：分组标题 16px/600 通栏，右侧 1px 延伸细线（`::after` 撑满剩余宽度），上下边距 4px / 18px。
+- 可选字段的说明文字放 `extra`：12px `rgba(0,0,0,.55)`、上边距 4px。
+- 上传区不带标签、通栏：Upload.Dragger，虚线框 `#D9D9D9`、底 `#FAFCFF`、圆角 8px、内边距 22px；图标 34px `rgba(0,0,0,.25)`、主文案 14px/500 `rgba(0,0,0,.65)`、说明 12px `rgba(0,0,0,.55)`，三行间距 6px，整体高约 133px。
+- 字段与校验（演示字段，按「基础信息 / 登记信息 / 辅助信息」三组）：姓名（必填）、手机号（必填 + 11 位格式校验）、部门（下拉）、登记类型（单选，默认个人登记）｜入职日期（日期，宽度 100%）、随行人数（数字 1–99 + 说明）、需要接送（开关）、随行设备（多选，**`options` 必须带 `value`**，否则整组不显示）、服务评分（评分）、物品重量（滑杆 0–30 + 说明）｜备注（多行，通栏）、附件上传（通栏）。
+- `暂存` 为非破坏操作（仅提示，不校验不清空）；`提交` 通过校验后提示成功并重置表单。
+- 响应式：主显示区宽 ≤860px 时表单退化为单列。
+
+**列表页（ProTable）**
+
+- 查询区一行最多 4 个查询元素（`span: 6`）；查询项超出一行时使用展开 / 收起。
+- 常用查询项：单号（模糊输入）、姓名（模糊输入）、类型（下拉 valueEnum）、状态（下拉 valueEnum）、登记时间（区间）。
+- 工具栏：右侧主操作 `+ 新建`（primary）与 `导入`、`批量删除`；勾选行后不显示「已选择 X 项」提示条（`tableAlertRender: false`）。
+- 表头背景 `#E6F4FF`（覆盖基线），文字保持默认深色。
+- 分页位于表格右下角：页码 + 每页条数选择。
 
 ## Ant Design v6 基线规范
 
